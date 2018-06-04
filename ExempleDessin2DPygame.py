@@ -26,5 +26,5 @@ pygame.draw.line(fenetre, NOIR, [150,250],[250,250], 2) # La bouche
 pygame.draw.rect(fenetre, ROUGE, [100,300,200,200]) # Le corps
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
+input("Entrez fin de ligne pour terminer") # Pour retarder la fermeture de la fenêtre
 pygame.quit() # Terminer pygame
