@@ -25,9 +25,9 @@ def dessiner_bot(x,y,largeur,hauteur):
 
 
 pygame.init() # Initialiser Pygame
-size = (400, 600) # Taille de la surface graphique
-fenetre = pygame.display.set_mode(size) # Ouvrir la fenêtre 
-
+LARGEUR_FENETRE = 400
+HAUTEUR_FENETRE = 600
+fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre
 pygame.display.set_caption('Exemple de dessin du Bot dans un rectangle englobant') # Définir le titre dans le haut de la fenêtre
 
 # Définir les couleurs employées dans le dessin

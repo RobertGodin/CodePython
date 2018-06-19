@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Exemple de fonction dessiner_bot
+Exemple de détection d’évènement de souris
 """
-
+# Importer la librairie de pygame et initialiser 
 import pygame
 
 def dessiner_bot(fenetre,x,y,largeur,hauteur):
@@ -23,20 +23,29 @@ def dessiner_bot(fenetre,x,y,largeur,hauteur):
     pygame.draw.line(fenetre, NOIR, [x+largeur/4,y+hauteur*3/8],[x+largeur*3/4,y+hauteur*3/8], 2) # La bouche
     pygame.draw.rect(fenetre, ROUGE, [x,y+hauteur/2,largeur,hauteur/2]) # Le corps
 
+pygame.init() # Initialiser les modules de Pygame
 
-pygame.init() # Initialiser Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
 fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre  
-pygame.display.set_caption('Exemple de dessin du Bot dans un rectangle englobant') # Définir le titre dans le haut de la fenêtre
+pygame.display.set_caption('Exemple de gestion de la souris') # Définir le titre dans le haut de la fenêtre
 
 BLANC = (255,255,255)
-fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
+fin = False 
 
-# Dessiner deux Bots en appelant la fonction à deux reprises
-dessiner_bot(fenetre,100,100,200,400)
-dessiner_bot(fenetre,25,50,100,200)
-
-pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
+# Position initiale du Bot
+x=100
+y=100
+# Itérer jusqu'à ce qu'un évènement provoque la fermeture de la fenêtre
+while not fin:
+    event = pygame.event.wait() # Chercher le prochain évènement à traiter        
+    if event.type == pygame.QUIT:  # Utilisateur a cliqué sur la fermeture de fenêtre ?
+        fin = True  # Fin de la boucle du jeu
+    elif event.type == pygame.MOUSEBUTTONUP: # Utilisateur a cliqué dans la fenêtre ?
+        x=event.pos[0] # Position x de la souris
+        y=event.pos[1] # Position y de la souris
+        fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
+        dessiner_bot(fenetre,x-30/2,y-60/2,30,60) # Dessiner le Bot à la position de la souris
+        pygame.display.flip() # Mettre à jour la fenêtre graphique
+ 
 pygame.quit() # Terminer pygame

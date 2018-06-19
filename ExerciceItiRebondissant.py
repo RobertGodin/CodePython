@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Exercice: fonction dessiner_iti
+Exercice du Iti qui rebondit
 """
-
+# Importer la librairie de pygame et initialiser 
 import pygame
 
 def dessiner_iti(fenetre,x,y,largeur,hauteur):
@@ -31,20 +31,37 @@ def dessiner_iti(fenetre,x,y,largeur,hauteur):
     pygame.draw.line(fenetre, NOIR, [x,y+hauteur],[milieux,y+hauteur*3/4], 2) # Jambe gauche
     pygame.draw.line(fenetre, NOIR, [x+largeur,y+hauteur],[milieux,y+hauteur*3/4], 2) # Jambe droite
 
-pygame.init() # Initialiser Pygame
+pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
-fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre
-pygame.display.set_caption('Exemple de dessin du Iti dans un rectangle englobant') # Définir le titre dans le haut de la fenêtre
-
+fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre 
+pygame.display.set_caption("Exercice du Iti qui rebondit") # Définir le titre dans le haut de la fenêtre
 
 BLANC = (255,255,255)
-fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
+horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
+x_iti = 175 # Position du Iti sur l'axe x
+y_iti = 0 # Position initiale du Iti sur l'axe y
+vitesse_deplacement = 5 # En pixels par scène
+LARGEUR_ITI = 50
+HAUTEUR_ITI = 100
 
-# Dessiner deux Iti en appelant la fonction à deux reprises
-dessiner_iti(fenetre,100,100,30,60)
-dessiner_iti(fenetre,25,50,100,200)
+# Boucle d'animation : Le Iti rebondit verticalement
+fin = False
+while not fin :
+    event = pygame.event.poll() # Chercher le prochain évènement à traiter        
+    if event.type == pygame.QUIT:  # Utilisateur a cliqué sur la fermeture de fenêtre ?
+        fin = True  # Fin de la boucle du jeu
+    else :
+        # Déplacer le Iti : Inverser la direction sur le bord est atteint
+        if y_iti+vitesse_deplacement > HAUTEUR_FENETRE-HAUTEUR_ITI or y_iti+vitesse_deplacement < 0 :
+            vitesse_deplacement = -vitesse_deplacement # Inverser la direction    
+        y_iti = y_iti+vitesse_deplacement
+        
+        fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
+        dessiner_iti(fenetre,x_iti,y_iti,LARGEUR_ITI,HAUTEUR_ITI) # Dessiner le Bot
+        pygame.display.flip() # Mettre à jour la fenêtre graphique
 
-pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
+
+        horloge.tick(60) # Pour animer avec 60 images pas seconde
+ 
 pygame.quit() # Terminer pygame
