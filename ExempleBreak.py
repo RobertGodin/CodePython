@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Lire une chaîne et compter vérifier si 'a' est dans la chaîne
+Lire une chaîne et vérifier si 'a' est dans la chaîne
 """
 
 uneChaine = input("Entrez une chaîne de caractères :")
