@@ -11,6 +11,17 @@ VERT = (0,255,0)
 ROSE = (255,100,100) 
 
 class BotAnime :
+    """ Un objet représente un Bot qui est animé dans une fenêtre Pygame 
+    
+    Le Bot est inscrit dans le rectangle englobant défini par les variables d'objet
+    (x,y,largeur et hauteur). Il se déplace en diagonale selon vistesse_x et vitesse_y. 
+        x : int
+        y : int
+        largeur : int
+        hauteur : int
+        vitesse_x : int
+        vitesse_y : int
+    """
         
     def __init__(self,x,y,largeur,hauteur,vitesse_x,vitesse_y):
         self.x = x
@@ -43,7 +54,17 @@ class BotAnime :
         self.y = self.y+self.vitesse_y
     
 class ItiAnime :
-
+    """ Un objet représente un Iti qui est animé dans une fenêtre Pygame 
+    
+    Le Iti est inscrit dans le rectangle englobant défini par les variables d'objet
+    (x,y,largeur et hauteur). Il se déplace en diagonale selon vistesse_x et vitesse_y. 
+        x : int
+        y : int
+        largeur : int
+        hauteur : int
+        vitesse_x : int
+        vitesse_y : int
+    """
     def __init__(self,x,y,largeur,hauteur,vitesse_x,vitesse_y):
         self.x = x
         self.y = y
