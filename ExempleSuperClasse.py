@@ -10,7 +10,7 @@ NOIR = (0,0,0)
 VERT = (0,255,0)    
 ROSE = (255,100,100) 
 
-class EntiteAnime :
+class EntiteAnimee :
     """ Un objet représente une entité qui est animée dans une fenêtre Pygame 
     
     L'entité est inscrite dans le rectangle englobant défini par les variables d'objet
@@ -30,9 +30,9 @@ class EntiteAnime :
             largeur_fenetre : int
             hauteur_fenetre : int
         """
-        EntiteAnime.fenetre = f
-        EntiteAnime.largeur_fenetre = f.get_width()
-        EntiteAnime.hauteur_fenetre = f.get_height()
+        EntiteAnimee.fenetre = f
+        EntiteAnimee.largeur_fenetre = f.get_width()
+        EntiteAnimee.hauteur_fenetre = f.get_height()
   
     def __init__(self,x,y,largeur,hauteur,vitesse_x,vitesse_y):
         self.x = x
@@ -44,14 +44,14 @@ class EntiteAnime :
         
     def deplacer(self):
         """ Déplacer l'entité en diagonale en rebondissant sur les bords de la fenetre"""
-        if self.x+self.vitesse_x > EntiteAnime.largeur_fenetre-self.largeur or self.x+self.vitesse_x < 0 :
+        if self.x+self.vitesse_x > EntiteAnimee.largeur_fenetre-self.largeur or self.x+self.vitesse_x < 0 :
             self.vitesse_x = -self.vitesse_x # Inverser la direction en x    
         self.x = self.x+self.vitesse_x
-        if self.y+self.vitesse_y > EntiteAnime.hauteur_fenetre-self.hauteur or self.y+self.vitesse_y < 0 :
+        if self.y+self.vitesse_y > EntiteAnimee.hauteur_fenetre-self.hauteur or self.y+self.vitesse_y < 0 :
             self.vitesse_y = -self.vitesse_y # Inverser la direction en y    
         self.y = self.y+self.vitesse_y
 
-class BotAnime(EntiteAnime) :
+class BotAnime(EntiteAnimee) :
     """ Un objet représente un Bot qui est animé dans une fenêtre Pygame 
         Sous-classe de EntiteAnime
     """
@@ -70,7 +70,7 @@ class BotAnime(EntiteAnime) :
         pygame.draw.rect(BotAnime.fenetre, ROUGE, [self.x,self.y+self.hauteur/2,self.largeur,self.hauteur/2]) # Le corps
         
     
-class ItiAnime(EntiteAnime) :
+class ItiAnime(EntiteAnimee) :
     """ Un objet représente un Iti qui est animé dans une fenêtre Pygame 
         Sous-classe de EntiteAnime    
     """
@@ -99,7 +99,7 @@ pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
 fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre 
-EntiteAnime.set_fenetre(fenetre)
+EntiteAnimee.set_fenetre(fenetre)
 pygame.display.set_caption("Exemple des Bots et Itis en diagonale avec super-classe EntiteAnime")
 
 BLANC = (255,255,255)

@@ -9,7 +9,7 @@ pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
 fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre 
-Entite.EntiteAnime.set_fenetre(fenetre)
+Entite.EntiteAnimee.set_fenetre(fenetre)
 pygame.display.set_caption("Exemple des Bots et Itis en diagonale avec module Entite")
 
 BLANC = (255,255,255)
