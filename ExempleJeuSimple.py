@@ -15,7 +15,7 @@ pygame.display.set_caption("Exemple de jeu avec module EntiteDuJeu")
 BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
-# Création de deux BotAnime et deux ItiAnime
+# Création de la liste des entités du jeu
 liste_entite = []
 liste_entite.append(EntiteDuJeu.BotAnime(10,100,40,80,3,3,"Son2.wav"))
 liste_entite.append(EntiteDuJeu.BotAnime(200,200,50,100,0,2,"Son2.wav"))
