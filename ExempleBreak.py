@@ -3,11 +3,11 @@
 Lire une chaîne et vérifier si 'a' est dans la chaîne
 """
 
-uneChaine = input("Entrez une chaîne de caractères :")
+une_chaine = input("Entrez une chaîne de caractères :")
 indice = 0
 trouve = False
-while indice < len(uneChaine) :
-    if uneChaine[indice] == 'a' :
+while indice < len(une_chaine) :
+    if une_chaine[indice] == 'a' :
         trouve = True
         break
     indice = indice + 1
