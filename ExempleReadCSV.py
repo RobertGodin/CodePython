@@ -5,7 +5,7 @@ Lecture du fichier Plants.csv en format csv
 
 import csv
 
-with open('Plants.csv', mode='r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    for ligne in csv_reader:
+with open('Plants.csv', mode='r') as fichier_csv:
+    lecteur_csv = csv.reader(fichier_csv)
+    for ligne in lecteur_csv:
         print(ligne)

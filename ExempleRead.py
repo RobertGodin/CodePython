@@ -2,7 +2,7 @@
 """
 Exemple du read()
 """
-fichier = open("Fichier1.txt", "r")
+fichier = open("Fichier1.txt", "rt")
 contenu_fichier = fichier.read()
 print("Taille fichier:", len(contenu_fichier))
 print("Contenu:")
