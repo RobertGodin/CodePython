@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Lecture du fichier Plants.csv en format csv, création d'une liste d'objets de la classe Plant
-Ecriture de l'objet liste_plants dans Plants.pickle avec le module pickle
+Lecture du fichier Plants.pickle avec pickle.load()
 """
 
 import csv

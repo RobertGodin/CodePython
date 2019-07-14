@@ -7,6 +7,8 @@ Ecriture de l'objet liste_plants dans Plants.pickle avec le module pickle
 import csv
 import struct
 import pickle
+
+# Classe Plant
 class Plant:
     def __init__(self,numero,description,prix):
         self.numero = numero
