@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Lecture du fichier Plants.csv en format csv, création d'une liste d'objets de la classe Plant
-Ecriture de l'objet liste_plants dans Plants.pickle avec le module pickle
+Ecriture des données de liste_plants dans Plants.json avec json.dump()
 """
 
 import csv
