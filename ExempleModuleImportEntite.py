@@ -16,10 +16,11 @@ BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
 # Création de deux BotAnime et deux ItiAnime
-bot1 = Entite.BotAnime(0,0,20,40,5,10)
-bot2 = Entite.BotAnime(100,200,30,60,10,2)
-iti1 = Entite.ItiAnime(200,150,40,80,3,3)
-iti2 = Entite.ItiAnime(300,300,50,100,5,10)
+liste_entite = []
+liste_entite.append(Entite.BotAnime(0,0,20,40,5,10))
+liste_entite.append(Entite.BotAnime(100,200,30,60,10,2))
+liste_entite.append(Entite.ItiAnime(200,150,40,80,3,3))
+liste_entite.append(Entite.ItiAnime(300,300,50,100,5,10))
 
 # Boucle d'animation
 fin = False
@@ -28,16 +29,12 @@ while not fin :
     if event.type == pygame.QUIT:  # Utilisateur a cliqué sur la fermeture de fenêtre ?
         fin = True  # Fin de la boucle du jeu
     else :
-        bot1.deplacer()
-        bot2.deplacer()
-        iti1.deplacer()
-        iti2.deplacer()
+        for une_entite in liste_entite :
+            une_entite.deplacer()
 
         fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
-        bot1.dessiner()
-        bot2.dessiner()
-        iti1.dessiner()
-        iti2.dessiner()
+        for une_entite in liste_entite :
+            une_entite.dessiner()
         
         pygame.display.flip() # Mettre à jour la fenêtre graphique
 
