@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Exemple d'animation d'entités : création d'une super classe EntiteAnime
+Exemple d'animation d'entités : création d'une super classe EntiteAnime et
+appel des méthodes d'animation des entités par itération et surcharge dynamique
 """
 # Importer la librairie de pygame et initialiser 
 import pygame
