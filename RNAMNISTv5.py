@@ -261,7 +261,7 @@ donneesxy_test = list(zip(x_test, y_test)) # Encodage int pour la classe dans le
 
 # Classification par RNA
 net = RNA([784, 30, 10])
-net.entrainer_par_mini_lot(donneesxy_ent,donneesxy_test,5,10,3.0)
+net.entrainer_par_mini_lot(donneesxy_ent,donneesxy_test,30,5,3.0)
 
 
 
