@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Exemple de réseau de neuronne à propagation avant et
-rétropropagation de l'erreur pour l'apprentissage
+Exemple de réseau de neuronne à propagation avant et rétropropagation de l'erreur pour l'apprentissage
+Application aux données MNIST
 """
 import random
 import numpy as np
@@ -10,64 +10,62 @@ random.seed(42)
 import matplotlib.pyplot as plt
 
 def sigmoide(z):
-    """The sigmoide function."""
+    """Fonction sigmoide"""
     return 1.0/(1.0+np.exp(-z))
 
 def derivee_sigmoide(z):
-    """Derivative of the sigmoide function."""
+    """Dérivée de la fonction sigmoide"""
     return sigmoide(z)*(1-sigmoide(z))
 
-def bitmap(classe):
-    """ Representer l'entier de classe par un vecteur bitmap (10,1) 
-    classe : entier entre 0 et 9 qui représente la classe de l'observation"""
-    e = np.zeros((10, 1))
-    e[classe] = 1.0
-    return e
+def dJ_dz_final(activation_finale, y):
+    """Dérivée de J par rapport à z pour la couche finale"""
+    return (activation_finale-y)
 
 class RNA(object):
     """ Un RNA est un réseau de neuronnes artificiel multi-couche.
     """
         
-    def __init__(self, ncs):
-        """ ncs[c] contient le nombre de neurones de la couche c, c = 0 ...nombre_couches-1
+    def __init__(self, liste_nc):
+        """ liste_nc[c] contient le nombre de neurones de la couche c, c = 0 ...nombre_couches-1
         la couche d'indice 0 est la couche d'entrée
-        ncs[nombre_couches-1] doit correspondre au nombre de catégories des y (sortie)
+        liste_nc[nombre_couches-1] doit correspondre au nombre de catégories des y (sortie)
         
-        liste_w[c] est la matrice des poids entre la couche c et c+1
-        liste_w[c][i,j] est le poids entre le neuronne i de la couche c+1 et j de la couche c
+        w[c] est la matrice des poids entre la couche c et c+1 (NB différent du livre à cause de l'indice 0)
+        w[c][i,j] est le poids entre le neuronne i de la couche c+1 et j de la couche c
         i = 0 correspond au biais par convention
         les poids sont initialisés avec un nombre aléatoire selon une distribution N(0,1)
         """
-        self.ncs = ncs
-        self.nombre_couches = len(ncs)
+        self.liste_nc = liste_nc
+        self.nombre_couches = len(liste_nc)
         # Initialiser les matrices des poids w avec des valeurs aleatoires N(0,1)
-        self.liste_w = [np.random.randn(x+1,y) for x, y in zip(ncs[:-1], ncs[1:])]
+        # NB w[c] correspond a la couche c+1
+        self.w = [np.random.randn(x+1,y) for x, y in zip(liste_nc[:-1], liste_nc[1:])]
 
     def propagation_avant_w(self, activation):
         """
         Traiter une entrée par propagation avant
         
-        activation: activation initiale qui correspond aux entrées (taille self.ncs[0])
+        activation: activation initiale qui correspond aux entrées (taille self.liste_nc[0])
         retourne l'activation de sortie après propagation avant"""
         
-        for w in self.liste_w:
-            activation = np.vstack((np.ones(1),sigmoide(np.dot(w.transpose(),activation))))
+        for un_w in self.w:
+            activation = np.vstack((np.ones(1),sigmoide(np.dot(un_w.transpose(),activation))))
         return activation
 
-    def entrainer_par_mini_lot(self,donnees_entrainement,donnees_test,nombre_epochs,taille_mini_lot,eta):
+    def entrainer_par_mini_lot(self,donnees_entrainement,donnees_test,nombre_epochs,taille_mini_lot,taux):
         """
         Entrainer le RNA par mini-lots
         Affiche le nombre de bons résultats des donnees_test pour chaque epoch
         
         donnees_entrainement : liste de tuples (x,y) pour l'entrainement où
-            x est un tableau de taille (ncs[0],1) où n est la taille des entrées
-            y est un encodage bitmap de la catégorie en tableau de taille ncs[nombre_couches-1]
+            x est un tableau de taille (liste_nc[0],1) où n est la taille des entrées
+            y est un encodage bitmap de la catégorie en tableau de taille liste_nc[nombre_couches-1]
         donnees_test : liste de tuples (x,y) pour les tests
-            x est un tableau de taille (ncs[0],1) où n est la taille des entrées
+            x est un tableau de taille (liste_nc[0],1) où n est la taille des entrées
             y un int où 0<=y< nombre de catégories
         nombre_epochs : nombre de passe d'entrainement
         taille_mini_lot : la taille de chacun des mini-lots
-        eta : vitesse d'apprentissage
+        taux : vitesse d'apprentissage
         """
         n_test = len(donnees_test)
         n_ent = len(donnees_entrainement)
@@ -82,13 +80,13 @@ class RNA(object):
             # Entrainer un mimi-lot à la fois
             for mini_lot in mini_lots:
                 # Initialiser les gradiants totaux à 0
-                liste_dJ_dw = [np.zeros(w.shape) for w in self.liste_w]
+                liste_dJ_dw = [np.zeros(w.shape) for w in self.w]
                 for x, y in mini_lot:
                     dJ_dw_une_ligne = self.retropropagation_w(x, y)
                     # ajouter les gradiants d'une observation aux totaux partiels du lot
                     liste_dJ_dw = [dJ_dw+dJ_dw_1 for (dJ_dw, dJ_dw_1) in zip(liste_dJ_dw, dJ_dw_une_ligne)]
                 # mettre à jour les paramètres du RNA avec les gradiants du lot    
-                self.liste_w = [w-(eta/len(mini_lot))*dw  for (w, dw) in zip(self.liste_w, liste_dJ_dw)]
+                self.w = [w-(taux/len(mini_lot))*dw  for (w, dw) in zip(self.w, liste_dJ_dw)]
             
              # Calcul des métriques de performance
             eqm_ent,ok_ent = self.metriques(donnees_entrainement)
@@ -121,29 +119,29 @@ class RNA(object):
         """Return a tuple ``(dJ_db, dJ_dw)`` representing the
         gradient for the cost function C_x.  ``dJ_db`` and
         ``dJ_dw`` are layer-by-layer lists of numpy arrays, similar
-        to ``self.liste_biais`` and ``self.liste_w``."""
+        to ``self.liste_biais`` and ``self.w``."""
 
-        # propagation_avant
+        # propagation_avant avec stockage des activations pour la rétropropagation
         activation = np.vstack((np.ones(1),x)) # activation de la couche 0
-        liste_activation = [np.vstack((np.ones(1),x))] # liste des activations couche par couche
-        liste_z = [] # liste des z par couche
-        for w in self.liste_w:
-            z = np.dot(w.transpose(),activation)
-            liste_z.append(z)
+        activation_par_couche = [np.vstack((np.ones(1),x))] # liste des activations couche par couche
+        z_par_couche = [] # liste des z par couche
+        for c in range(self.nombre_couches-1): # NB c part a 0
+            z = np.dot(self.w[c].transpose(),activation)
+            z_par_couche.append(z)
             activation = np.vstack((np.ones(1),sigmoide(z))) 
-            liste_activation.append(activation)
-        
+            activation_par_couche.append(activation)
+            
         # retropropagation
-        dJ_dw = [np.zeros(w.shape) for w in self.liste_w]
-        dJ_dz = self.dJ_da_final(liste_activation[-1][1:], y)
-        dJ_dw[-1] = np.dot(liste_activation[-2],dJ_dz.transpose())
+        dJ_dw = [np.zeros(un_w.shape) for un_w in self.w]
+        dJ_dz = dJ_dz_final(activation_par_couche[self.nombre_couches-1][1:], y)
+        dJ_dw[self.nombre_couches-2] = np.dot(activation_par_couche[self.nombre_couches-2],dJ_dz.transpose())
         # itérer de la couche nc-2 à la couche 1
-        for c in range(2, self.nombre_couches):
-            z = liste_z[-c]
-            dJ_dz = np.dot(self.liste_w[-c+1], dJ_dz)[1:] * derivee_sigmoide(z)
-            dJ_dw[-c] = np.dot(liste_activation[-c-1], dJ_dz.transpose())
+        for c in range(self.nombre_couches-2,0,-1):
+            z = z_par_couche[c-1] # NB z_par_couche[c-1] correspond à z de la couche c
+            dJ_dz = np.dot(self.w[c][1:], dJ_dz) * derivee_sigmoide(z) # dérivée pour zi pour la couche c
+            dJ_dw[c-1] = np.dot(activation_par_couche[c-1], dJ_dz.transpose())
         return dJ_dw
-
+    
     def metriques(self, donnees):
         """Retourne le nombre de bons résultats
         Choisit l'indice de la classe dont l'activation est la plus grande"""
@@ -157,9 +155,13 @@ class RNA(object):
                 nb_correct+=1
         return (erreur_quadratique,nb_correct)
 
-    def dJ_da_final(self, output_activations, y):
-        """Dérivée de J par rapport à l'activation"""
-        return (output_activations-y)
+
+def bitmap(classe):
+    """ Representer l'entier de classe par un vecteur bitmap (10,1) 
+    classe : entier entre 0 et 9 qui représente la classe de l'observation"""
+    e = np.zeros((10, 1))
+    e[classe] = 1.0
+    return e
 
 # Chargement des données de MNIST
 import pickle, gzip
@@ -177,4 +179,4 @@ donneesxy_test = list(zip(x_test, y_test)) # Encodage int pour la classe dans le
 
 # Classification par RNA
 net = RNA([784, 30, 10])
-net.entrainer_par_mini_lot(donneesxy_ent,donneesxy_test,30,5,3.0)
+net.entrainer_par_mini_lot(donneesxy_ent,donneesxy_test,30,5,0.1)
