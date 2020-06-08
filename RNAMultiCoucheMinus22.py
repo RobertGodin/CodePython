@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# Implémentation d'un RNA multi-couche
+# Implémentation d'un RNA multi-couche, exemple avec le RNA Minus
 
 import numpy as np
+np.random.seed(42) # pour reproduire les mêmes résultats
 
 class Couche:
     """ Classe abstraite qui représente une couche du RNA
@@ -12,7 +13,7 @@ class Couche:
         self.X = None
         self.Y = None
 
-    def propagation_une_observation(self, X):
+    def propager_une_couche(self, X):
         """ Calculer la sortie Y pour une valeur de X
         
         X : vecteur des variables prédictives
@@ -20,7 +21,7 @@ class Couche:
         """
         raise NotImplementedError
 
-    def retropropagation(self, dJ_dY, taux):
+    def retropropager_une_couche(self, dJ_dY, taux):
         """ Calculer les dérivées par rapport à X et les autres paramètres à partir de dJ_dY
         et mettre à jour les paramètres de la couche selon le taux spécifié.
         
@@ -52,20 +53,20 @@ class CoucheDenseLineaire(Couche):
         else:
             self.B = init_B
 
-    def propagation_une_observation(self, X):
+    def propager_une_couche(self, X):
         """ Fait la propagation de X et retourne Y=WX+B. 
         """
         self.X = X
         self.Y = self.B + np.dot(self.X, self.W)
         return self.Y
 
-    def retropropagation(self, dJ_dY, taux):
+    def retropropager_une_couche(self, dJ_dY, taux):
+        """ Calculer les dérivées dJ_dW,dJ_dB,dJ_dX pour une couche linéaire dense et
+        mettre à jour les paramètres
+        """
         dJ_dW = np.dot(self.X.T, dJ_dY)
         dJ_dB = dJ_dY
         dJ_dX = np.dot(dJ_dY, self.W.T)
-        print("dJ_dW",dJ_dW)
-        print("dJ_dB",dJ_dB)
-        print("dJ_dX",dJ_dX)
         # Metre à jour les paramètres W et B
         self.W -= taux * dJ_dW
         self.B -= taux * dJ_dB
@@ -83,14 +84,14 @@ class CoucheActivation(Couche):
         self.fonction_activation = fonction_activation
         self.derivee = derivee
 
-    def propagation_une_observation(self, X):
+    def propager_une_couche(self, X):
         """ Retourne Y=fonction_activation(X)
         """
         self.X = X
         self.Y = self.fonction_activation(self.X)
         return self.Y
 
-    def retropropagation(self, dJ_dY, taux):
+    def retropropager_une_couche(self, dJ_dY, taux):
         """ Retourne la dérivée de la fonction d'activation par rapport l'entrée X
         Le taux n'est pas utilisé parce qu'il n'y a pas de paramètres à modifier dans ce genre de couche
         """
@@ -139,7 +140,7 @@ class ReseauMultiCouches:
         self.cout = cout
         self.derivee_cout = derivee_cout
 
-    def propagation_donnees_ent_X(self, donnees_ent_X):
+    def propagation_donnees_ent_X(self, donnees_ent_X,trace=False):
         """ Prédire Y pour chacune des observations dans donnees_ent_X)
         donnees_ent_X : np.array 3D des valeurs de X pour chacune des observations
             chacun des X est un np.array 2D de taille (1,n)
@@ -149,8 +150,12 @@ class ReseauMultiCouches:
         predictions_Y = []
         for indice_observation in range(nb_observations):
             XY_propage = donnees_ent_X[indice_observation]
+            if trace: 
+                print("Valeur de X initiale:",XY_propage)
             for couche in self.couches:
-                XY_propage = couche.propagation_une_observation(XY_propage)
+                XY_propage = couche.propager_une_couche(XY_propage)
+                if trace: 
+                    print("Valeur de Y après propagation pour la couche:",XY_propage)
             predictions_Y.append(XY_propage)
 
         return predictions_Y
@@ -173,7 +178,7 @@ class ReseauMultiCouches:
                 # Propagation avant pour une observation X
                 XY_propage = donnees_ent_X[indice_observation]
                 for couche in self.couches:
-                    XY_propage = couche.propagation_une_observation(XY_propage)
+                    XY_propage = couche.propager_une_couche(XY_propage)
 
                 # Calcul du coût pour une observation
                 cout_total += self.cout(XY_propage,donnees_ent_Y[indice_observation])
@@ -182,7 +187,7 @@ class ReseauMultiCouches:
                 # dJ_dX_dJ_dY représente la valeur de la dérivée dJ_dX passée à dJ_dY de couche en couche
                 dJ_dX_dJ_dY = self.derivee_cout(XY_propage,donnees_ent_Y[indice_observation])
                 for couche in reversed(self.couches):
-                    dJ_dX_dJ_dY = couche.retropropagation(dJ_dX_dJ_dY, taux)
+                    dJ_dX_dJ_dY = couche.retropropager_une_couche(dJ_dX_dJ_dY, taux)
 
             # Calculer et afficher le coût moyen pour une epoch
             cout_moyen = cout_total/nb_observations
@@ -203,13 +208,17 @@ un_RNA = ReseauMultiCouches()
 un_RNA.ajouter_couche(CoucheDenseLineaire(2, 2, init_W=W1, init_B=B1))
 un_RNA.ajouter_couche(CoucheDenseLineaire(2, 2,init_W=W2, init_B=B2))
 
+# Tester le RNA Minus avant entrainement
+predictions_Y = un_RNA.propagation_donnees_ent_X(donnees_ent_X,trace=True)
+print("Prédiction initiale: ",predictions_Y)
 # Entrainer le RNA Minus
 un_RNA.specifier_J(erreur_quadratique, d_erreur_quadratique)
-un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X, donnees_ent_Y, nb_epochs=10, taux=0.1)
+un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X, donnees_ent_Y, nb_epochs=1, taux=0.1)
 
 # Tester le RNA Minus
-predictions_Y = un_RNA.propagation_donnees_ent_X(donnees_ent_X)
-print(predictions_Y)
+predictions_Y = un_RNA.propagation_donnees_ent_X(donnees_ent_X,trace=True)
+print("Prédiction après entraînement:", predictions_Y)
+
 
 
 
