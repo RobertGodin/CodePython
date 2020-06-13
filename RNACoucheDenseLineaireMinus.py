@@ -3,53 +3,26 @@
 
 import numpy as np
 np.random.seed(42) # pour reproduire les mêmes résultats
+import matplotlib.pyplot as plt
 
-class Couche:
-    """ Classe abstraite qui représente une couche du RNA
-        X: vecteur, entrée de la couche 
-        Y: vecteur, sortie de la couche
-    """
-    def __init__(self):
-        self.X = None
-        self.Y = None
-
-    def propager_une_couche(self,X):
-        """ Calculer la sortie Y pour une valeur de X
-        
-        X : vecteur des variables prédictives
-        Les valeurs de X et Y sont stockées pour les autres traitements.
-        """
-        raise NotImplementedError
-
-    def retropropager_une_couche(self,dJ_dY,taux,trace=False):
-        """ Calculer les dérivées par rapport à X et les autres paramètres à partir de dJ_dY
-        et mettre à jour les paramètres de la couche selon le taux spécifié.
-        
-        dJ_dY : np.float, la dérivée de J par rapport à la sortie Y
-        taux : np.float, taux est le taux dans la descente de gradiant
-        retourne la dérivée de J par rapport à X
-        """
-        raise NotImplementedError
-
-# inherit from base class Layer
-class CoucheDenseLineaire(Couche):
+class CoucheDenseLineaire():
     """ Couche linéaire dense. Y=WX+B
     """
     def __init__(self,n,m,init_W=None,init_B=None):
-        """ Initilalise les paramètres de la couche. W et B sont initialisés avec des valeurs aléatoires
-        selon une distribution uniforme entre U(-0.5,0.5) si les paramètres init_W et init_B
-        ne sont pas spécifiés.
+        """ Initilalise les paramètres de la couche. W et B sont initialisés avec init_W et init_B lorsque spécifiés.
+        Sinon, des valeurs aléatoires sont générés pour W une distribution normale N(0,1) et B est initialisée avec des 0 
+        si les paramètres init_W et init_B ne sont pas spécifiés.
         n : int, taille du vecteur d'entrée X
         m : int, taille du vecteur de sortie Y
         init_W : np.array, shape(n,m), valeur initiale optionnelle de W
         init_B : np.array, shape(1,m), valeur initial optionnelle de B
         """
         if init_W is None :
-            self.W = np.random.rand(n,m) - 0.5
+            self.W = np.random.randn(n,m) 
         else:
             self.W = init_W
         if init_B is None :
-            self.B = np.random.rand(1, m) - 0.5
+            self.B = np.zeros(1,m)
         else:
             self.B = init_B
 
@@ -61,8 +34,12 @@ class CoucheDenseLineaire(Couche):
         return self.Y
 
     def retropropager_une_couche(self,dJ_dY,taux,trace=False):
-        """ Calculer les dérivées dJ_dW,dJ_dB,dJ_dX pour une couche linéaire dense et
-        mettre à jour les paramètres
+        """ Calculer les dérivées dJ_dW,dJ_dB,dJ_dX pour une couche dense linéaire et
+        mettre à jour les paramètres selon le taux spécifié
+        
+        dJ_dY : np.array(1,2), dérivées de J par rapport à la sortie Y
+        taux : float, le taux dans la descente de gradiant
+        retourne la dérivée de J par rapport à X
         """
         dJ_dW = np.dot(self.X.T,dJ_dY)
         dJ_dB = dJ_dY
@@ -117,6 +94,8 @@ class ReseauMultiCouches:
         nb_observations = len(donnees_ent_X)
         predictions_Y = []
         for indice_observation in range(nb_observations):
+            # XY_propage : contient la valeur de X de la couche courante qui correspond 
+            # à la valeur de Y de la couche précédente
             XY_propage = donnees_ent_X[indice_observation]
             if trace: 
                 print("Valeur de X initiale:",XY_propage)
@@ -130,6 +109,7 @@ class ReseauMultiCouches:
 
     def entrainer_descente_gradiant_stochastique(self,donnees_ent_X,donnees_ent_Y,nb_epochs,taux,trace=False):
         """ Entrainer le réseau par descente de gradiant stochastique (une observation à la fois)
+        
         donnees_ent_X : np.array 3D des valeurs de X pour chacune des observations
             chacun des X est un np.array 2D de taille (1,n)
         donnees_ent_Y : np.array 3D des valeurs de Y pour chacune des observations
@@ -137,6 +117,8 @@ class ReseauMultiCouches:
         """
         
         nb_observations = len(donnees_ent_X)
+        if trace :
+            liste_eq = []
 
         # Boucle d'entrainement principale, nb_epochs fois
         for cycle in range(nb_epochs):
@@ -144,24 +126,43 @@ class ReseauMultiCouches:
             # Descente de gradiant stochastique, une observation à la fois
             for indice_observation in range(nb_observations):
                 # Propagation avant pour une observation X
+                # XY_propage : contient la valeur de X de la couche courante qui correspond 
+                # à la valeur de Y de la couche précédente
                 XY_propage = donnees_ent_X[indice_observation]
+                if trace: 
+                    print("Valeur de X initiale:",XY_propage)
+
                 for couche in self.couches:
                     XY_propage = couche.propager_une_couche(XY_propage)
+                    if trace: 
+                        print("Valeur de Y après propagation pour la couche:",XY_propage)
 
                 # Calcul du coût pour une observation
                 cout_total += self.cout(XY_propage,donnees_ent_Y[indice_observation])
 
                 # Rétropropagation pour une observation
-                # dJ_dX_dJ_dY représente la valeur de la dérivée dJ_dX passée à dJ_dY de couche en couche
+                # dJ_dX_dJ_dY représente la valeur de la dérivée dJ_dX de la couche suivante
+                # qui correspond à dJ_dY de la couche en cours de traitement
                 dJ_dX_dJ_dY = self.derivee_cout(XY_propage,donnees_ent_Y[indice_observation])
                 if trace :
-                    print("dJ_dY couche finale:",dJ_dX_dJ_dY)
+                    print("dJ_dY pour la couche finale:",dJ_dX_dJ_dY)
                 for couche in reversed(self.couches):
                     dJ_dX_dJ_dY = couche.retropropager_une_couche(dJ_dX_dJ_dY,taux,trace)
 
             # Calculer et afficher le coût moyen pour une epoch
             cout_moyen = cout_total/nb_observations
-            print('epoch %d/%d   cout_moyen=%f' % (cycle+1,nb_epochs,cout_moyen))
+            if trace:
+                print(f'-------- > epoch {cycle+1}:  erreur quadratique moyenne {cout_moyen}')
+                liste_eq.append(cout_moyen)
+        # Affichage du graphique d'évolution de l'erreur quadratique
+        if trace:
+            plt.plot(np.arange(0,nb_epochs),liste_eq)
+            plt.title("Evolution de l'erreur quadratique")
+            plt.xlabel('epoch')
+            plt.ylabel('erreur')
+            plt.legend(loc='upper center')
+            plt.show()
+
 
 # Une seule observation pour illustrer le fonctionnement de RNA Minus           
 donnees_ent_X = np.array([[[1,1]]])
@@ -179,15 +180,14 @@ un_RNA.specifier_J(erreur_quadratique,d_erreur_quadratique)
 un_RNA.ajouter_couche(CoucheDenseLineaire(2,2,init_W=W1,init_B=B1))
 un_RNA.ajouter_couche(CoucheDenseLineaire(2,2,init_W=W2,init_B=B2))
 
-# Tester le RNA Minus avant entrainement
-predictions_Y = un_RNA.propagation_donnees_ent_X(donnees_ent_X,trace=True)
-print("Prédiction initiale: ",predictions_Y)
 # Entrainer le RNA Minus
+un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X,donnees_ent_Y,nb_epochs=3,taux=0.1,trace=True)
 
-un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X,donnees_ent_Y,nb_epochs=1,taux=0.1,trace = True)
 
-# Tester le RNA Minus
-predictions_Y = un_RNA.propagation_donnees_ent_X(donnees_ent_X,trace=True)
-print("Prédiction après entraînement:",predictions_Y)
+
+
+
+
+
 
 

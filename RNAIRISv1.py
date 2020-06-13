@@ -183,6 +183,7 @@ def bitmap2(classe):
     return e
 
 donnees=[(np.reshape(iris_X[i], (2, 1)),bitmap2(iris_y_setosa[i])) for i in range(len(iris_X))]
+t = [np.reshape(iris_X[i], (1, 2)) for i in range(len(iris_X))]
 donnees_test,donnees_ent=diviser_ent_test(donnees, 0.5)
 
 un_rna = RNA([2,5,2])
