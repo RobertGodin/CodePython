@@ -174,8 +174,8 @@ class ReseauMultiCouches:
                 nb_correct+=1
         return (erreur_quadratique/len(donnees_Y),nb_correct/len(donnees_Y))
 
-    def entrainer_descente_gradiant_stochastique(self,donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y,
-                                                 nb_epochs,taux,trace=False,graph_cout=False):
+    def entrainer_descente_gradiant_mini_lot(self,donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y,
+                                                 nb_epochs,taille_mini_lot,taux,trace=False,graph_cout=False):
         """ Entrainer le réseau par descente de gradiant stochastique (une observation à la fois)
         
         donnees_ent_X : np.array 3D des valeurs de X pour chacune des observations d'entrainement
@@ -201,34 +201,43 @@ class ReseauMultiCouches:
         # Boucle d'entrainement principale, nb_epochs fois
         for cycle in range(nb_epochs):
             cout_total = 0
-            # Descente de gradiant stochastique, une observation à la fois
-            for indice_observation in range(nb_observations):
+            derivee_cout_total = 0
+            # Descente de gradiant en lot, calculer l'erreur et la dérivée pour toutes les observations
+            
+            for indice_mini_lot in range(0, nb_observations, taille_mini_lot):
+                
+                derivee_cout_total_mini_lot = 0
+                for indice_observation in range(indice_mini_lot,min(indice_mini_lot+taille_mini_lot,nb_observations)):
                 # Propagation avant pour une observation X
                 # XY_propage : contient la valeur de X de la couche courante qui correspond 
                 # à la valeur de Y de la couche précédente
-                XY_propage = donnees_ent_X[indice_observation]
-                if trace: 
-                    print("Valeur de X initiale:",XY_propage)
-
-                for couche in self.couches:
-                    XY_propage = couche.propager_une_couche(XY_propage)
+                    XY_propage = donnees_ent_X[indice_observation]
                     if trace: 
-                        print("Valeur de Y après propagation pour la couche:",XY_propage)
+                        print("Valeur de X initiale:",XY_propage)
 
-                # Calcul du coût pour une observation
-                cout_total += self.cout(XY_propage,donnees_ent_Y[indice_observation])
+                    for couche in self.couches:
+                        XY_propage = couche.propager_une_couche(XY_propage)
+                        if trace: 
+                            print("Valeur de Y après propagation pour la couche:",XY_propage)
 
-                # Rétropropagation pour une observation
+                    # Calcul du coût pour une observation
+                    cout_total += self.cout(XY_propage,donnees_ent_Y[indice_observation])
+                    derivee_cout_total_mini_lot += self.derivee_cout(XY_propage,donnees_ent_Y[indice_observation])
+
+                derivee_cout_moyen_min_lot = derivee_cout_total_mini_lot/taille_mini_lot
+                
+                # Rétropropagation pour le mini-lot
                 # dJ_dX_dJ_dY représente la valeur de la dérivée dJ_dX de la couche suivante
                 # qui correspond à dJ_dY de la couche en cours de traitement
-                dJ_dX_dJ_dY = self.derivee_cout(XY_propage,donnees_ent_Y[indice_observation])
+                dJ_dX_dJ_dY = derivee_cout_moyen_min_lot
                 if trace :
                     print("dJ_dY pour la couche finale:",dJ_dX_dJ_dY)
                 for couche in reversed(self.couches):
                     dJ_dX_dJ_dY = couche.retropropager_une_couche(dJ_dX_dJ_dY,taux,trace)
-
+                
             # Calculer et afficher le coût moyen pour une epoch
             cout_moyen = cout_total/nb_observations
+            
             if graph_cout:
                 print(f'-------- > epoch {cycle+1}:  erreur quadratique moyenne {cout_moyen}')
                 cout_ent,ok_ent = self.metriques(donnees_ent_X,donnees_ent_Y)
@@ -269,49 +278,35 @@ def sigmoide(x):
 def derivee_sigmoide(x):
     return sigmoide(x)*(1-sigmoide(x))
 
-def bitmap12(classe):
-    """ Representer l'entier de classe par un vecteur bitmap (1,2) 
-    classe : entier entre 0 et 9 qui représente la classe de l'observation"""
-    e = np.zeros((1,2))
+
+def bitmap(classe):
+    """ Representer l'entier de classe par un vecteur bitmap (10,1) 
+    classe : entier ebitmap(ntre 0 et 9 qui représente la classe de l'observation"""
+    e = np.zeros((1,10))
     e[0,classe] = 1.0
     return e
 
-def partager(donnees_X,donnees_Y,proportion):
-    """ Partager les données X et Y aléatoirement en deux groupes, un pour les
-    entrainements et un pour les tests
-    proportion : float, proportion des données pour le groupe test
-    """
-    donnees=[[donnees_X[i],donnees_Y[i]] for i in range(len(donnees_X))]
-    random.shuffle(donnees)
-    taille_test = int(len(donnees) * proportion)
-    donnees_test = donnees[:taille_test]
-    donnees_ent = donnees[taille_test:]
-    donnees_ent_X = [donnees_ent[i][0] for i in range(len(donnees_ent))]
-    donnees_ent_Y = [donnees_ent[i][1] for i in range(len(donnees_ent))]
-    donnees_test_X = [donnees_test[i][0] for i in range(len(donnees_test))]
-    donnees_test_Y = [donnees_test[i][1] for i in range(len(donnees_test))]
-    return  donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y
-    
+# Chargement des données de MNIST
+import pickle, gzip
 
-# Charger les données de Iris et les convertir dans le format approprié pour ReseauMultiCouches
-# Seules les colonnes 1 et 2 sont employées pour la prédiction
-from sklearn import datasets
-dataset_iris = datasets.load_iris()
-donnees_X = dataset_iris.data[:,None,:2]
-iris_y = dataset_iris.target
-iris_y_setosa = (iris_y==0).astype(np.int) # setosa ou non
-donnees_Y=[bitmap12(iris_y_setosa[i]) for i in range(len(iris_y))]
-donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y=partager(donnees_X,donnees_Y,0.5)
+fichier_donnees = gzip.open(r"mnist.pkl.gz", 'rb')
+donnees_ent, donnees_validation, donnees_test = pickle.load(fichier_donnees, encoding='latin1')
+fichier_donnees.close()
+    
+donnees_ent_X = donnees_ent[0].reshape((50000,1,784))
+donnees_ent_Y = [bitmap(y) for y in donnees_ent[1]] # Encodgae bitmap de l'entier (one hot encoding)
+donnees_test_X = donnees_test[0].reshape((10000,1,784))
+donnees_test_Y = [bitmap(y) for y in donnees_test[1]] # Encodgae bitmap de l'entier (one hot encoding)
 
 # Définir l'architecture du RNA 
 # Deux couches denses linéaires suivies chacune d'une couche d'activation sigmoide
 un_RNA = ReseauMultiCouches()
 un_RNA.specifier_J(erreur_quadratique,d_erreur_quadratique)
-un_RNA.ajouter_couche(CoucheDenseLineaire(2,5))
+un_RNA.ajouter_couche(CoucheDenseLineaire(784,30))
 un_RNA.ajouter_couche(CoucheActivation(sigmoide,derivee_sigmoide))
-un_RNA.ajouter_couche(CoucheDenseLineaire(5,2))
+un_RNA.ajouter_couche(CoucheDenseLineaire(30,10))
 un_RNA.ajouter_couche(CoucheActivation(sigmoide,derivee_sigmoide))
-# Entrainer le RNA Minus
-un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y,
-                                                nb_epochs=100,taux=0.1,trace = False, graph_cout = True)
+# Entrainer le RNA
+un_RNA.entrainer_descente_gradiant_mini_lot(donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y,
+                                                nb_epochs=30,taille_mini_lot=10,taux=0.1,trace = False, graph_cout = True)
 

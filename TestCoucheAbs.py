@@ -13,8 +13,8 @@ random.seed(42)
 
 class Couche:
     """ Classe abstraite qui représente une couche du RNA
-        X:  np.array 2D de taille (1,n), entrée de la couche 
-        Y: np.array 2D de taille (1,m), sortie de la couche
+        X: vecteur, entrée de la couche 
+        Y: vecteur, sortie de la couche
     """
 
     def propager_une_couche(self,X):
@@ -28,7 +28,7 @@ class Couche:
         """ Calculer les dérivées par rapport à X et les autres paramètres à partir de dJ_dY
         et mettre à jour les paramètres de la couche selon le taux spécifié.
         
-        dJ_dY : np.array(1,m), dérivées de J par rapport à la sortie Y
+        dJ_dY : np.array(1,2), dérivées de J par rapport à la sortie Y
         taux : float, le taux dans la descente de gradiant
         retourne la dérivée de J par rapport à X
         """
