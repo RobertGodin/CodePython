@@ -7,9 +7,10 @@
 
 import numpy as np
 np.random.seed(42) # pour reproduire les mêmes résultats
-import matplotlib.pyplot as plt
 import random
 random.seed(42)
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 class Couche:
     """ Classe abstraite qui représente une couche du RNA
@@ -38,15 +39,17 @@ class CoucheDenseLineaire(Couche):
     """
     def __init__(self,n,m,init_W=None,init_B=None):
         """ Initilalise les paramètres de la couche. W et B sont initialisés avec init_W et init_B lorsque spécifiés.
-        Sinon, des valeurs aléatoires sont générés pour W une distribution normale N(0,1) et B est initialisée avec des 0 
+        Sinon, des valeurs aléatoires sont générés pour W une distribution normale et B est initialisée avec des 0 
         si les paramètres init_W et init_B ne sont pas spécifiés.
+        L'initialization He est employée pour W
         n : int, taille du vecteur d'entrée X
         m : int, taille du vecteur de sortie Y
         init_W : np.array, shape(n,m), valeur initiale optionnelle de W
         init_B : np.array, shape(1,m), valeur initial optionnelle de B
         """
         if init_W is None :
-            self.W = np.random.randn(n,m) 
+            # Initialization He
+            self.W = np.random.randn(n,m) * np.sqrt(2/n) 
         else:
             self.W = init_W
         if init_B is None :
@@ -110,14 +113,56 @@ class CoucheActivation(Couche):
         """
         return self.derivee(self.X) * dJ_dY
 
+class CoucheSoftmax(Couche):
+    """ Couche d'activation selon une fonction spécifiée dans le constructeur
+    """
+    def __init__(self,n):
+        """ Initialise la fonction_activation ainsi que la dérivée
+        fonction_activation: une fonction qui prend chacune des valeurs de X et 
+        retourne Y=fonction_activation(X)
+        n: nombre d'entrées et de sorties
+        """
+        self.n = n
+
+    def propager_une_couche(self,X):
+        """ Calcule les activations softmax pour chacunes de entrées xi
+        """
+        self.X = X
+        exponentielles = np.exp(X)
+        self.Y = exponentielles / np.sum(exponentielles)
+        return self.Y
+
+    def retropropager_une_couche(self,dJ_dY,taux,trace=False):
+        """ Retourne la dérivée de la fonction d'activation par rapport l'entrée X
+        Le taux n'est pas utilisé parce qu'il n'y a pas de paramètres à modifier dans ce genre de couche
+        """
+        dyidxj = np.zeros((self.n,self.n))
+        for i in range(self.n):
+            for j in range(self.n):
+                dyidxj[i,j]= self.Y[0,j]*(delta_kroneker(i,j)-self.Y[0,i])
+        return np.dot(dJ_dY,dyidxj)
+
+def delta_kroneker(i,j):
+    if i==j :
+        return 1
+    else:
+        return 0
+
 def erreur_quadratique(y_prediction,y):
     """ Retourne l'erreur quadratique entre la prédiction y_prediction et la valeur attendue y
     """ 
     return np.sum(np.power(y_prediction-y,2))
 
-
 def d_erreur_quadratique(y_prediction,y):
     return 2*(y_prediction-y)
+
+def entropie_croisee(y_prediction,y):
+    """ Retourne l'erreur quadratique entre la prédiction y_prediction et la valeur attendue y
+    """ 
+    return -np.sum(y*np.log(y_prediction))
+
+def d_entropie_croisee(y_prediction,y):
+    return -(y/y_prediction)
 
 class ReseauMultiCouches:
     """ Réseau mutli-couche formé par une séquence de Couches
@@ -230,7 +275,7 @@ class ReseauMultiCouches:
             # Calculer et afficher le coût moyen pour une epoch
             cout_moyen = cout_total/nb_observations
             if graph_cout:
-                print(f'-------- > epoch {cycle+1}:  erreur quadratique moyenne {cout_moyen}')
+                print(f'-------- > epoch {cycle+1}:  coût moyen {cout_moyen}')
                 cout_ent,ok_ent = self.metriques(donnees_ent_X,donnees_ent_Y)
                 cout_test,ok_test = self.metriques(donnees_test_X,donnees_test_Y)
                 liste_cout_moyen_ent.append(cout_ent)
@@ -243,7 +288,7 @@ class ReseauMultiCouches:
         if graph_cout:
             plt.plot(np.arange(0,nb_epochs),liste_cout_moyen_ent,label='Erreur entraînement')
             plt.plot(np.arange(0,nb_epochs),liste_cout_moyen_test,label='Erreur test')
-            plt.title("Evolution de L'erreur quadratique")
+            plt.title("Evolution du coût")
             plt.xlabel('epoch')
             plt.ylabel('moyenne par observation')
             plt.legend(loc='upper center')
@@ -269,10 +314,21 @@ def sigmoide(x):
 def derivee_sigmoide(x):
     return sigmoide(x)*(1-sigmoide(x))
 
+def relu(x):
+    return np.maximum(x,0)
+
+def derivee_relu(x):
+    return np.heaviside(x,1)
+
+def softmax(x):
+    return np.exp(x)/np.sum(np.exp(x))
+
+
+
 
 def bitmap(classe):
     """ Representer l'entier de classe par un vecteur bitmap (10,1) 
-    classe : entier ebitmap(ntre 0 et 9 qui représente la classe de l'observation"""
+    classe : entier (entre 0 et 9 qui représente la classe de l'observation"""
     e = np.zeros((1,10))
     e[0,classe] = 1.0
     return e
@@ -292,17 +348,19 @@ donnees_test_Y = [bitmap(y) for y in donnees_test[1]] # Encodgae bitmap de l'ent
 # Définir l'architecture du RNA 
 # Deux couches denses linéaires suivies chacune d'une couche d'activation sigmoide
 un_RNA = ReseauMultiCouches()
-un_RNA.specifier_J(erreur_quadratique,d_erreur_quadratique)
+un_RNA.specifier_J(entropie_croisee,d_entropie_croisee)
 un_RNA.ajouter_couche(CoucheDenseLineaire(784,30))
-un_RNA.ajouter_couche(CoucheActivation(sigmoide,derivee_sigmoide))
+un_RNA.ajouter_couche(CoucheActivation(relu,derivee_relu))
 un_RNA.ajouter_couche(CoucheDenseLineaire(30,10))
-un_RNA.ajouter_couche(CoucheActivation(sigmoide,derivee_sigmoide))
+un_RNA.ajouter_couche(CoucheSoftmax(10))
+
 # Entrainer le RNA
 un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y,
-                                                nb_epochs=30,taux=0.1,trace = False, graph_cout = True)
+                                                nb_epochs=30,taux=0.003,trace = False, graph_cout = True)
 
 for i in range(3):
-    print("Classe de l'image",i,":",donnees_ent_Y[i],"Prédiction:",un_RNA.propagation_donnees_X(donnees_ent_X[i]))
+    print("Classe de l'image",i,":",donnees_ent_Y[i])
+    print("Prédiction softmax:",un_RNA.propagation_donnees_X(donnees_ent_X[i]))
     image_applatie = donnees_ent_X[i]
     une_image = image_applatie.reshape(28, 28)
     plt.imshow(une_image, cmap = mpl.cm.binary, interpolation="nearest")
