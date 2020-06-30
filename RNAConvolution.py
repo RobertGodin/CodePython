@@ -136,6 +136,72 @@ class CoucheSoftmax(Couche):
         Le taux n'est pas utilisé parce qu'il n'y a pas de paramètres à modifier dans ce genre de couche
         """
         return np.dot(dJ_dY,self.Y.T*(np.identity(self.n)-self.Y))
+    
+from scipy import signal
+
+## Math behind this layer can found at : 
+## https://medium.com/@2017csm1006/forward-and-backpropagation-in-convolutional-neural-network-4dfa96d7b37e
+
+# inherit from base class Layer
+# This convolutional layer is always with stride 1
+class CoucheConvolution(Couche):
+    # forme_X = (largeur X, hauteur X, profondeur X)
+    # forme_filtre = (largeur filtre, hauteur filtre)
+    # profondeur_Y = profondeur de Y
+    def __init__(self,forme_X , forme_filtre, profondeur_Y):
+        self.forme_X = forme_X
+        self.profondeur_X = forme_X[2]
+        self.forme_filtre = forme_filtre
+        self.profondeur_Y = profondeur_Y
+        self.forme_Y = (forme_X[0]-forme_filtre[0]+1, forme_X[1]-forme_filtre[1]+1, profondeur_Y)
+        self.F = np.random.rand(forme_filtre[0], forme_filtre[1], self.profondeur_X, profondeur_Y) - 0.5
+        self.B = np.random.rand(profondeur_Y) - 0.5
+
+    # returns output for a given input
+    def propager_une_couche(self, X):
+        self.X = X
+        self.Y = np.zeros(self.forme_Y)
+
+        for indice_profondeur_Y in range(self.profondeur_Y):
+            for d in range(self.profondeur_X):
+                # self.Y[:,:,indice_profondeur_Y] += signal.correlate2d(self.X[:,:,d], self.F[:,:,d,indice_profondeur_Y], 'valid') + self.B[indice_profondeur_Y]
+                # print(signal.correlate2d(self.X[:,:,d], self.F[:,:,d,indice_profondeur_Y], 'valid') + self.B[indice_profondeur_Y])
+                for i in range(self.forme_X[0]-self.forme_filtre[0]+1):
+                    for j in range(self.forme_X[1]-self.forme_filtre[1]+1):
+                        correlation2d = np.sum(self.X[i:i+self.forme_filtre[0],j:j+self.forme_filtre[1],d]*self.F[:,:,d,indice_profondeur_Y])+self.B[indice_profondeur_Y]
+                        self.Y[i,j,indice_profondeur_Y] += correlation2d
+                # print(self.Y[:,:,indice_profondeur_Y])                     
+        return self.Y
+
+    # calcul des gradiants pour F, B et X de la couche par rapport à J
+    def retropropager_une_couche(self, dJ_dY, taux, trace=False):
+        dJ_dX = np.zeros(self.forme_X)
+        dJ_dW = np.zeros((self.forme_filtre[0], self.forme_filtre[1], self.profondeur_X, self.profondeur_Y))
+        dB = np.zeros(self.profondeur_Y)
+
+        for indice_profondeur_Y in range(self.profondeur_Y):
+            for d in range(self.profondeur_X):
+                dJ_dX[:,:,d] += signal.convolve2d(dJ_dY[:,:,indice_profondeur_Y], self.F[:,:,d,indice_profondeur_Y], 'full')
+                dJ_dW[:,:,d,indice_profondeur_Y] = signal.correlate2d(self.X[:,:,d], dJ_dY[:,:,indice_profondeur_Y], 'valid')
+            dB[indice_profondeur_Y] = self.profondeur_Y * np.sum(dJ_dY[:,:,indice_profondeur_Y])
+
+        self.F -= taux*dJ_dW
+        self.B -= taux*dB
+        return dJ_dX    
+    
+# inherit from base class Layer
+class CoucheApplatissement(Couche):
+    # returns the flattened input
+    def propager_une_couche(self, X):
+        self.X = X
+        self.Y = X.flatten().reshape((1,-1))
+        return self.Y
+
+    # Returns input_error=dE/dX for a given dJ_dY=dE/dY.
+    # taux is not used because there is no "learnable" parameters.
+    def retropropager_une_couche(self, dJ_dY, taux, trace=False):
+        return dJ_dY.reshape(self.X.shape)
+
 
 def erreur_quadratique(y_prediction,y):
     """ Retourne l'erreur quadratique entre la prédiction y_prediction et la valeur attendue y
@@ -323,29 +389,30 @@ fichier_donnees = gzip.open(r"mnist.pkl.gz", 'rb')
 donnees_ent, donnees_validation, donnees_test = pickle.load(fichier_donnees, encoding='latin1')
 fichier_donnees.close()
     
-donnees_ent_X = donnees_ent[0].reshape((50000,1,784))
+donnees_ent_X = donnees_ent[0].reshape((50000,28,28,1))
 donnees_ent_Y = [bitmap(y) for y in donnees_ent[1]] # Encodgae bitmap de l'entier (one hot encoding)
-donnees_test_X = donnees_test[0].reshape((10000,1,784))
+donnees_test_X = donnees_test[0].reshape((10000,28,28,1))
 donnees_test_Y = [bitmap(y) for y in donnees_test[1]] # Encodgae bitmap de l'entier (one hot encoding)
 
 # Définir l'architecture du RNA 
-# Deux couches denses linéaires suivies chacune d'une couche d'activation sigmoide
+
 un_RNA = ReseauMultiCouches()
 un_RNA.specifier_J(entropie_croisee,d_entropie_croisee)
-un_RNA.ajouter_couche(CoucheDenseLineaire(784,30))
+un_RNA.ajouter_couche(CoucheConvolution((28,28,1),(3,3),1))
+un_RNA.ajouter_couche(CoucheActivation(tanh,derivee_tanh))
+un_RNA.ajouter_couche(CoucheApplatissement())
+un_RNA.ajouter_couche(CoucheDenseLineaire(26*26*1,10))
 un_RNA.ajouter_couche(CoucheActivation(relu,derivee_relu))
-un_RNA.ajouter_couche(CoucheDenseLineaire(30,10))
+un_RNA.ajouter_couche(CoucheDenseLineaire(10,10))
 un_RNA.ajouter_couche(CoucheSoftmax(10))
 
 # Entrainer le RNA
 un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:100],donnees_ent_Y[:100],donnees_test_X[:100],donnees_test_Y[:100],
-                                                nb_epochs=30,taux=0.003,trace = False, graph_cout = True)
+                                                nb_epochs=10,taux=0.003,trace = False, graph_cout = True)
 
 for i in range(3):
     print("Classe de l'image",i,":",donnees_ent_Y[i])
     print("Prédiction softmax:",un_RNA.propagation_donnees_X(donnees_ent_X[i:i+1]))
-    image_applatie = donnees_ent_X[i]
-    une_image = image_applatie.reshape(28, 28)
-    plt.imshow(une_image, cmap = mpl.cm.binary, interpolation="nearest")
+    plt.imshow(donnees_ent_X[i].reshape(28,28), cmap = mpl.cm.binary, interpolation="nearest")
     plt.axis("off")
     plt.show()

@@ -137,6 +137,12 @@ class CoucheSoftmax(Couche):
         """
         return np.dot(dJ_dY,self.Y.T*(np.identity(self.n)-self.Y))
 
+def delta_kroneker(i,j):
+    if i==j :
+        return 1
+    else:
+        return 0
+
 def erreur_quadratique(y_prediction,y):
     """ Retourne l'erreur quadratique entre la prédiction y_prediction et la valeur attendue y
     """ 
@@ -338,12 +344,12 @@ un_RNA.ajouter_couche(CoucheDenseLineaire(30,10))
 un_RNA.ajouter_couche(CoucheSoftmax(10))
 
 # Entrainer le RNA
-un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:100],donnees_ent_Y[:100],donnees_test_X[:100],donnees_test_Y[:100],
+un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y,
                                                 nb_epochs=30,taux=0.003,trace = False, graph_cout = True)
 
 for i in range(3):
     print("Classe de l'image",i,":",donnees_ent_Y[i])
-    print("Prédiction softmax:",un_RNA.propagation_donnees_X(donnees_ent_X[i:i+1]))
+    print("Prédiction softmax:",un_RNA.propagation_donnees_X(donnees_ent_X[i]))
     image_applatie = donnees_ent_X[i]
     une_image = image_applatie.reshape(28, 28)
     plt.imshow(une_image, cmap = mpl.cm.binary, interpolation="nearest")
