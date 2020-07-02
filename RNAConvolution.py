@@ -176,16 +176,28 @@ class CoucheConvolution(Couche):
     # calcul des gradiants pour F, B et X de la couche par rapport à J
     def retropropager_une_couche(self, dJ_dY, taux, trace=False):
         dJ_dX = np.zeros(self.forme_X)
-        dJ_dW = np.zeros((self.forme_filtre[0], self.forme_filtre[1], self.profondeur_X, self.profondeur_Y))
+        dJ_dF = np.zeros((self.forme_filtre[0], self.forme_filtre[1], self.profondeur_X, self.profondeur_Y))
         dB = np.zeros(self.profondeur_Y)
 
         for indice_profondeur_Y in range(self.profondeur_Y):
             for d in range(self.profondeur_X):
-                dJ_dX[:,:,d] += signal.convolve2d(dJ_dY[:,:,indice_profondeur_Y], self.F[:,:,d,indice_profondeur_Y], 'full')
-                dJ_dW[:,:,d,indice_profondeur_Y] = signal.correlate2d(self.X[:,:,d], dJ_dY[:,:,indice_profondeur_Y], 'valid')
-            dB[indice_profondeur_Y] = self.profondeur_Y * np.sum(dJ_dY[:,:,indice_profondeur_Y])
-
-        self.F -= taux*dJ_dW
+                # dJ_dX[:,:,d] += signal.convolve2d(dJ_dY[:,:,indice_profondeur_Y], self.F[:,:,d,indice_profondeur_Y], 'full')                
+                for i in range(self.forme_X[0]):
+                    for j in range(self.forme_X[1]):
+                        convolution2d = 0
+                        for r in range(max(0,i-self.forme_filtre[0]+1),min(self.forme_X[0]-self.forme_filtre[0],i)):
+                            for s in range(max(0,j-self.forme_filtre[1]+1),min(self.forme_X[1]-self.forme_filtre[1],j)):
+                                convolution2d += dJ_dY[r,s,indice_profondeur_Y]*self.F[i-r,j-s,d,indice_profondeur_Y]
+                        dJ_dX[i,j,d] += convolution2d
+                
+                # dJ_dF[:,:,d,indice_profondeur_Y] = signal.correlate2d(self.X[:,:,d], dJ_dY[:,:,indice_profondeur_Y], 'valid')                
+                for i in range(self.forme_filtre[0]):
+                    for j in range(self.forme_filtre[1]):
+                        dJ_dF[i,j,d,indice_profondeur_Y] = np.sum(self.X[i:i+self.forme_X[0]-self.forme_filtre[0]+1,j:j+self.forme_X[1]-self.forme_filtre[1]+1,d]*dJ_dY[:,:,indice_profondeur_Y])
+         
+            #dB[indice_profondeur_Y] = self.profondeur_Y * np.sum(dJ_dY[:,:,indice_profondeur_Y])
+            dB[indice_profondeur_Y] = np.sum(dJ_dY[:,:,indice_profondeur_Y])
+        self.F -= taux*dJ_dF
         self.B -= taux*dB
         return dJ_dX    
     
