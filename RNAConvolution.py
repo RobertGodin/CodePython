@@ -139,15 +139,10 @@ class CoucheSoftmax(Couche):
     
 from scipy import signal
 
-## Math behind this layer can found at : 
-## https://medium.com/@2017csm1006/forward-and-backpropagation-in-convolutional-neural-network-4dfa96d7b37e
-
-# inherit from base class Layer
-# This convolutional layer is always with stride 1
 class CoucheConvolution(Couche):
     # forme_X = (largeur X, hauteur X, profondeur X)
     # forme_filtre = (largeur filtre, hauteur filtre)
-    # profondeur_Y = profondeur de Y
+    # profondeur_Y = profondeur de Y (nombre de filtres produits par la couche)
     def __init__(self,forme_X , forme_filtre, profondeur_Y):
         self.forme_X = forme_X
         self.profondeur_X = forme_X[2]
@@ -410,16 +405,16 @@ donnees_test_Y = [bitmap(y) for y in donnees_test[1]] # Encodgae bitmap de l'ent
 
 un_RNA = ReseauMultiCouches()
 un_RNA.specifier_J(entropie_croisee,d_entropie_croisee)
-un_RNA.ajouter_couche(CoucheConvolution((28,28,1),(3,3),1))
+un_RNA.ajouter_couche(CoucheConvolution((28,28,1),(3,3),5))
 un_RNA.ajouter_couche(CoucheActivation(tanh,derivee_tanh))
 un_RNA.ajouter_couche(CoucheApplatissement())
-un_RNA.ajouter_couche(CoucheDenseLineaire(26*26*1,10))
+un_RNA.ajouter_couche(CoucheDenseLineaire(26*26*5,10))
 un_RNA.ajouter_couche(CoucheActivation(relu,derivee_relu))
 un_RNA.ajouter_couche(CoucheDenseLineaire(10,10))
 un_RNA.ajouter_couche(CoucheSoftmax(10))
 
 # Entrainer le RNA
-un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:100],donnees_ent_Y[:100],donnees_test_X[:100],donnees_test_Y[:100],
+un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:10000],donnees_ent_Y[:10000],donnees_test_X[:2000],donnees_test_Y[:2000],
                                                 nb_epochs=10,taux=0.003,trace = False, graph_cout = True)
 
 for i in range(3):
