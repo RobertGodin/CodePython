@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # Implémentation d'un RNA par couche
-# Deux types de couches : dense linéaire et activation
-# Division des données en deux groupes : entrainement et test
-
+# Jout de Couche convolution
 # Exemple avec MNIST
 
 import numpy as np
@@ -137,7 +135,39 @@ class CoucheSoftmax(Couche):
         """
         return np.dot(dJ_dY,self.Y.T*(np.identity(self.n)-self.Y))
     
-from scipy import signal
+def correlation(X,F):
+    """ Calculer la corrélation discrète valide entre X et F
+    X : np.array 2d
+    F : np.array 2d de taille inférieure à X """
+    largeur_Y = X.shape[0]-F.shape[0]+1
+    hauteur_Y = X.shape[1]-F.shape[1]+1
+    Y=np.zeros((largeur_Y,hauteur_Y))
+    for i in range(largeur_Y):
+        for j in range(hauteur_Y):
+            Y[i,j] = np.sum(X[i:i+F.shape[0],j:j+F.shape[1]]*F)
+    return Y
+
+def convolution_pleine(X,F):
+    """ Calculer la corrélation discrète pareille entre X et F
+    X : np.array 2d
+    F : np.array 2d de taille inférieure à X, taille impaire par hypothèse """
+
+    X_plus_bordure = np.vstack((np.zeros((F.shape[0]-1,X.shape[1])),
+                                X,np.zeros((F.shape[0]-1,X.shape[1]))))
+    X_plus_bordure = np.hstack((np.zeros((X_plus_bordure.shape[0],F.shape[1]-1)),
+                                X_plus_bordure,np.zeros((X_plus_bordure.shape[0],F.shape[1]-1))))
+    largeur_Y = X_plus_bordure.shape[0]-F.shape[0]+1
+    hauteur_Y = X_plus_bordure.shape[1]-F.shape[1]+1
+    Y=np.zeros((largeur_Y,hauteur_Y))
+    F_inverse=np.zeros_like(F)
+    for i in range(F.shape[0]):
+        for j in range(F.shape[1]):
+            F_inverse[F.shape[0]-i-1,F.shape[1]-j-1]= F[i,j]
+    for i in range(largeur_Y):
+        for j in range(hauteur_Y):
+            Y[i,j] = np.sum(X_plus_bordure[i:i+F_inverse.shape[0],j:j+F_inverse.shape[1]]*F_inverse)
+    return Y
+
 
 class CoucheConvolution(Couche):
     # forme_X = (largeur X, hauteur X, profondeur X)
@@ -152,20 +182,14 @@ class CoucheConvolution(Couche):
         self.F = np.random.rand(forme_filtre[0], forme_filtre[1], self.profondeur_X, profondeur_Y) - 0.5
         self.B = np.random.rand(profondeur_Y) - 0.5
 
-    # returns output for a given input
     def propager_une_couche(self, X):
         self.X = X
         self.Y = np.zeros(self.forme_Y)
 
         for indice_profondeur_Y in range(self.profondeur_Y):
-            for d in range(self.profondeur_X):
-                # self.Y[:,:,indice_profondeur_Y] += signal.correlate2d(self.X[:,:,d], self.F[:,:,d,indice_profondeur_Y], 'valid') + self.B[indice_profondeur_Y]
-                # print(signal.correlate2d(self.X[:,:,d], self.F[:,:,d,indice_profondeur_Y], 'valid') + self.B[indice_profondeur_Y])
-                for i in range(self.forme_X[0]-self.forme_filtre[0]+1):
-                    for j in range(self.forme_X[1]-self.forme_filtre[1]+1):
-                        correlation2d = np.sum(self.X[i:i+self.forme_filtre[0],j:j+self.forme_filtre[1],d]*self.F[:,:,d,indice_profondeur_Y])+self.B[indice_profondeur_Y]
-                        self.Y[i,j,indice_profondeur_Y] += correlation2d
-                # print(self.Y[:,:,indice_profondeur_Y])                     
+            for indice_profondeur_X in range(self.profondeur_X):
+                self.Y[:,:,indice_profondeur_Y] += correlation(self.X[:,:,indice_profondeur_X], 
+                      self.F[:,:,indice_profondeur_X,indice_profondeur_Y]) +self.B[indice_profondeur_Y]
         return self.Y
 
     # calcul des gradiants pour F, B et X de la couche par rapport à J
@@ -175,28 +199,28 @@ class CoucheConvolution(Couche):
         dB = np.zeros(self.profondeur_Y)
 
         for indice_profondeur_Y in range(self.profondeur_Y):
-            for d in range(self.profondeur_X):
+            for indice_profondeur_X in range(self.profondeur_X):
+                dJ_dX[:,:,indice_profondeur_X] += convolution_pleine(dJ_dY[:,:,indice_profondeur_Y], self.F[:,:,indice_profondeur_X,indice_profondeur_Y])
                 # dJ_dX[:,:,d] += signal.convolve2d(dJ_dY[:,:,indice_profondeur_Y], self.F[:,:,d,indice_profondeur_Y], 'full')                
-                for i in range(self.forme_X[0]):
-                    for j in range(self.forme_X[1]):
-                        convolution2d = 0
-                        for r in range(max(0,i-self.forme_filtre[0]+1),min(self.forme_X[0]-self.forme_filtre[0],i)):
-                            for s in range(max(0,j-self.forme_filtre[1]+1),min(self.forme_X[1]-self.forme_filtre[1],j)):
-                                convolution2d += dJ_dY[r,s,indice_profondeur_Y]*self.F[i-r,j-s,d,indice_profondeur_Y]
-                        dJ_dX[i,j,d] += convolution2d
-                
+                # for i in range(self.forme_X[0]):
+                #     for j in range(self.forme_X[1]):
+                #         convolution2d = 0
+                #         for r in range(max(0,i-self.forme_filtre[0]+1),min(self.forme_X[0]-self.forme_filtre[0],i)):
+                #             for s in range(max(0,j-self.forme_filtre[1]+1),min(self.forme_X[1]-self.forme_filtre[1],j)):
+                #                 convolution2d += dJ_dY[r,s,indice_profondeur_Y]*self.F[i-r,j-s,d,indice_profondeur_Y]
+                #         dJ_dX[i,j,d] += convolution2d
+                dJ_dF[:,:,indice_profondeur_X,indice_profondeur_Y] = correlation(self.X[:,:,indice_profondeur_X], dJ_dY[:,:,indice_profondeur_Y])
                 # dJ_dF[:,:,d,indice_profondeur_Y] = signal.correlate2d(self.X[:,:,d], dJ_dY[:,:,indice_profondeur_Y], 'valid')                
-                for i in range(self.forme_filtre[0]):
-                    for j in range(self.forme_filtre[1]):
-                        dJ_dF[i,j,d,indice_profondeur_Y] = np.sum(self.X[i:i+self.forme_X[0]-self.forme_filtre[0]+1,j:j+self.forme_X[1]-self.forme_filtre[1]+1,d]*dJ_dY[:,:,indice_profondeur_Y])
+                # for i in range(self.forme_filtre[0]):
+                #     for j in range(self.forme_filtre[1]):
+                #         dJ_dF[i,j,d,indice_profondeur_Y] = np.sum(self.X[i:i+self.forme_X[0]-self.forme_filtre[0]+1,j:j+self.forme_X[1]-self.forme_filtre[1]+1,d]*dJ_dY[:,:,indice_profondeur_Y])
          
             #dB[indice_profondeur_Y] = self.profondeur_Y * np.sum(dJ_dY[:,:,indice_profondeur_Y])
-            dB[indice_profondeur_Y] = np.sum(dJ_dY[:,:,indice_profondeur_Y])
+            dB[indice_profondeur_Y] = self.profondeur_Y * np.sum(dJ_dY[:,:,indice_profondeur_Y])
         self.F -= taux*dJ_dF
         self.B -= taux*dB
         return dJ_dX    
     
-# inherit from base class Layer
 class CoucheApplatissement(Couche):
     # returns the flattened input
     def propager_une_couche(self, X):
@@ -414,7 +438,7 @@ un_RNA.ajouter_couche(CoucheDenseLineaire(10,10))
 un_RNA.ajouter_couche(CoucheSoftmax(10))
 
 # Entrainer le RNA
-un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:10000],donnees_ent_Y[:10000],donnees_test_X[:2000],donnees_test_Y[:2000],
+un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:1000],donnees_ent_Y[:1000],donnees_test_X[:200],donnees_test_Y[:200],
                                                 nb_epochs=10,taux=0.003,trace = False, graph_cout = True)
 
 for i in range(3):
