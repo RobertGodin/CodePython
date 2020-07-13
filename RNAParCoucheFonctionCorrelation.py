@@ -168,12 +168,14 @@ def convolution_pleine(X,F):
             Y[i,j] = np.sum(X_plus_bordure[i:i+F_inverse.shape[0],j:j+F_inverse.shape[1]]*F_inverse)
     return Y
 
-
 class CoucheConvolution(Couche):
-    # forme_X = (largeur X, hauteur X, profondeur X)
-    # forme_filtre = (largeur filtre, hauteur filtre)
-    # profondeur_Y = profondeur de Y (nombre de filtres produits par la couche)
+    """ Couche convolution qui calcule en réalité la corrélation avec les filtres F """
+
     def __init__(self,forme_X , forme_filtre, profondeur_Y):
+        """ 
+        forme_X = (largeur X, hauteur X, profondeur X)
+        forme_filtre = (largeur filtre, hauteur filtre)
+        profondeur_Y = profondeur de Y (nombre de filtres de la couche)"""
         self.forme_X = forme_X
         self.profondeur_X = forme_X[2]
         self.forme_filtre = forme_filtre
@@ -185,7 +187,6 @@ class CoucheConvolution(Couche):
     def propager_une_couche(self, X):
         self.X = X
         self.Y = np.zeros(self.forme_Y)
-
         for indice_profondeur_Y in range(self.profondeur_Y):
             for indice_profondeur_X in range(self.profondeur_X):
                 self.Y[:,:,indice_profondeur_Y] += correlation(self.X[:,:,indice_profondeur_X], 
@@ -197,35 +198,20 @@ class CoucheConvolution(Couche):
         dJ_dX = np.zeros(self.forme_X)
         dJ_dF = np.zeros((self.forme_filtre[0], self.forme_filtre[1], self.profondeur_X, self.profondeur_Y))
         dB = np.zeros(self.profondeur_Y)
-
         for indice_profondeur_Y in range(self.profondeur_Y):
             for indice_profondeur_X in range(self.profondeur_X):
                 dJ_dX[:,:,indice_profondeur_X] += convolution_pleine(dJ_dY[:,:,indice_profondeur_Y], self.F[:,:,indice_profondeur_X,indice_profondeur_Y])
-                # dJ_dX[:,:,d] += signal.convolve2d(dJ_dY[:,:,indice_profondeur_Y], self.F[:,:,d,indice_profondeur_Y], 'full')                
-                # for i in range(self.forme_X[0]):
-                #     for j in range(self.forme_X[1]):
-                #         convolution2d = 0
-                #         for r in range(max(0,i-self.forme_filtre[0]+1),min(self.forme_X[0]-self.forme_filtre[0],i)):
-                #             for s in range(max(0,j-self.forme_filtre[1]+1),min(self.forme_X[1]-self.forme_filtre[1],j)):
-                #                 convolution2d += dJ_dY[r,s,indice_profondeur_Y]*self.F[i-r,j-s,d,indice_profondeur_Y]
-                #         dJ_dX[i,j,d] += convolution2d
                 dJ_dF[:,:,indice_profondeur_X,indice_profondeur_Y] = correlation(self.X[:,:,indice_profondeur_X], dJ_dY[:,:,indice_profondeur_Y])
-                # dJ_dF[:,:,d,indice_profondeur_Y] = signal.correlate2d(self.X[:,:,d], dJ_dY[:,:,indice_profondeur_Y], 'valid')                
-                # for i in range(self.forme_filtre[0]):
-                #     for j in range(self.forme_filtre[1]):
-                #         dJ_dF[i,j,d,indice_profondeur_Y] = np.sum(self.X[i:i+self.forme_X[0]-self.forme_filtre[0]+1,j:j+self.forme_X[1]-self.forme_filtre[1]+1,d]*dJ_dY[:,:,indice_profondeur_Y])
-         
-            #dB[indice_profondeur_Y] = self.profondeur_Y * np.sum(dJ_dY[:,:,indice_profondeur_Y])
             dB[indice_profondeur_Y] = np.sum(dJ_dY[:,:,indice_profondeur_Y])
         self.F -= taux*dJ_dF
         self.B -= taux*dB
         return dJ_dX    
     
 class CoucheApplatissement(Couche):
-    """Produire une forme aplatie de l'entrée X"""
+    """Produire une forme applatie de l'entrée X"""
     def propager_une_couche(self, X):
         self.X = X
-        self.Y = X.flatten().reshape((1,-1))
+        self.Y = X.reshape((1,-1))
         return self.Y
 
     def retropropager_une_couche(self, dJ_dY, taux, trace=False):
@@ -434,7 +420,7 @@ un_RNA.ajouter_couche(CoucheDenseLineaire(10,10))
 un_RNA.ajouter_couche(CoucheSoftmax(10))
 
 # Entrainer le RNA
-un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:5000],donnees_ent_Y[:5000],donnees_test_X[:1000],donnees_test_Y[:1000],
+un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:500],donnees_ent_Y[:500],donnees_test_X[:100],donnees_test_Y[:100],
                                                 nb_epochs=10,taux=0.01,trace = False, graph_cout = True)
 
 for i in range(3):
