@@ -428,17 +428,13 @@ donnees_test_X = donnees_test[0].reshape((10000,28,28,1))
 donnees_test_Y = [bitmap(y) for y in donnees_test[1]] # Encodgae bitmap de l'entier (one hot encoding)
 
 # Définir l'architecture du RNA 
-
 un_RNA = ReseauMultiCouches()
 un_RNA.specifier_J(entropie_croisee,d_entropie_croisee)
 un_RNA.ajouter_couche(CoucheConvolution((28,28,1),(3,3),5))
 un_RNA.ajouter_couche(CoucheActivation(relu,derivee_relu))
 un_RNA.ajouter_couche(CoucheApplatissement())
 un_RNA.ajouter_couche(CoucheDenseLineaire(26*26*5,10))
-un_RNA.ajouter_couche(CoucheActivation(relu,derivee_relu))
-un_RNA.ajouter_couche(CoucheDenseLineaire(10,10))
 un_RNA.ajouter_couche(CoucheSoftmax(10))
-
 
 # Entrainer le RNA
 un_RNA.entrainer_descente_gradiant_stochastique(donnees_ent_X[:1000],donnees_ent_Y[:1000],donnees_test_X[:100],donnees_test_Y[:100],
