@@ -308,5 +308,5 @@ un_RNA.ajouter_couche(CoucheDenseLineaire(30,10))
 un_RNA.ajouter_couche(CoucheActivation(sigmoide,derivee_sigmoide))
 # Entrainer le RNA
 un_RNA.entrainer_descente_gradiant_mini_lot(donnees_ent_X,donnees_ent_Y,donnees_test_X,donnees_test_Y,
-                                                nb_epochs=30,taille_mini_lot=10,taux=0.1,trace = False, graph_cout = True)
+                                                nb_epochs=30,taille_mini_lot=100,taux=0.1,trace = False, graph_cout = True)
 

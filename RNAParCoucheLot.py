@@ -2,6 +2,7 @@
 # Implémentation d'un RNA par couche
 # Deux types de couches : dense linéaire et activation
 # Division des données en deux groupes : entrainement et test
+# Descente  gradiant par lot
 
 # Exemple avec Iris
 
