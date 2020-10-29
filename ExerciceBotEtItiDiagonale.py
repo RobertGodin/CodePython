@@ -137,6 +137,6 @@ while not fin :
         dessiner_iti(fenetre,x_iti2,y_iti2,LARGEUR_ITI2,HAUTEUR_ITI2) # Dessiner le Iti2
         pygame.display.flip() # Mettre à jour la fenêtre graphique
 
-        horloge.tick(60) # Pour animer avec 60 images pas seconde
+        horloge.tick(60) # Pour animer avec 60 images par seconde
  
 pygame.quit() # Terminer pygame

@@ -58,6 +58,6 @@ while not fin :
         pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 
-        horloge.tick(60) # Pour animer avec 60 images pas seconde
+        horloge.tick(60) # Pour animer avec 60 images par seconde
  
 pygame.quit() # Terminer pygame
