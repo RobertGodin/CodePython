@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Dec  9 12:10:21 2020
-
-@author: Robert
+Exemple d'utilisation de CartPole dans l'environnement gym
 """
 
 import gym
-env = gym.make("CartPole-v1")
-observation = env.reset()
-for _ in range(1000):
-  env.render()
-  action = env.action_space.sample() # your agent here (this takes random actions)
-  observation, reward, done, info = env.step(action)
-
-  if done:
+env = gym.make('CartPole-v0')
+for i_episode in range(5):
     observation = env.reset()
+    for t in range(100):
+        env.render()
+        print(observation)
+        action = env.action_space.sample()
+        observation, reward, done, info = env.step(action)
+        if done:
+            print("Épisode terminé après {} étapes".format(t+1))
+            break
 env.close()
