@@ -105,7 +105,7 @@ class BlackjackEnv(gym.Env):
 
 import matplotlib
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D 
 
 def afficher_V(V, titre="Fonction valeur de la politique selon méthode de Monte Carlo première visite"):
     """
@@ -160,8 +160,8 @@ def predire_valeurpi_mc(politique, env, nombre_episodes, gamma=1.0):
         The etat is a tuple and the value is a float.
     """
 
-    N = defaultdict(float) # Nombre d'observations pour chacun des états (pour calcul incrémental)
     V = defaultdict(float) # Valeur moyenne de récompense pour chacun des états
+    liste_G = defaultdict(list) # Liste des retours observés pour chacun des états
     
     for i_episode in range(1, nombre_episodes + 1):
         # Print out which episode we're on, useful for debugging.
@@ -185,8 +185,8 @@ def predire_valeurpi_mc(politique, env, nombre_episodes, gamma=1.0):
             G=gamma*G+episode[t][2]
             St = episode[t][0]
             if St not in etats_episode[0:t]:
-                N[St]+=1
-                V[St]=V[St]+(G-V[St])/N[St]
+                liste_G[St].append(G)
+                V[St]=np.mean(liste_G[St])
     return V
 
 

@@ -105,7 +105,7 @@ class BlackjackEnv(gym.Env):
 
 import matplotlib
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D 
 
 def afficher_V(V, titre="Fonction valeur de la politique selon méthode de Monte Carlo première visite"):
     """
@@ -145,7 +145,25 @@ def afficher_V(V, titre="Fonction valeur de la politique selon méthode de Monte
 
 env = BlackjackEnv()
 
-def predire_valeurpi_mc(politique, env, nombre_episodes, gamma=1.0):
+def contruire_politique_epsilon_vorace(Q, epsilon, nb_actions):
+    """
+    Creer une fonction qui calcule les probabilités d'une politique e-vorace
+    
+        Q: dictionnaire etat -> valeurs des actions (np.array de taille nb_actions)
+        epsilon: float entre 0 et 1
+        nb_actions: nombre d'actions de l'environnement
+    
+    Retourne une fonction qui prend un etat et retourne les probabilités d'actions e-vorace
+    
+    """
+    def f_politique(etat):
+        probabilites_actions = np.ones(nb_actions, dtype=float) * epsilon / nb_actions
+        meilleure_action = np.argmax(Q[etat])
+        probabilites_actions[meilleure_action] += (1.0 - epsilon)
+        return probabilites_actions
+    return f_politique
+
+def politique_optimale_mc(env, nombre_episodes, gamma=1.0, epsilon=0.1):
     """
     Prédire la valeur de la politique par la métode de Monte Carlo première visite
     Monte Carlo prediction algorithm. Calculates the value function
@@ -159,9 +177,9 @@ def predire_valeurpi_mc(politique, env, nombre_episodes, gamma=1.0):
         V: Dictionnaire(etat,valeur)
         The etat is a tuple and the value is a float.
     """
-
-    N = defaultdict(float) # Nombre d'observations pour chacun des états (pour calcul incrémental)
-    V = defaultdict(float) # Valeur moyenne de récompense pour chacun des états
+    N = defaultdict(float)
+    Q = defaultdict(lambda: np.zeros(env.action_space.n))
+    politique = contruire_politique_epsilon_vorace(Q, epsilon, env.action_space.n)
     
     for i_episode in range(1, nombre_episodes + 1):
         # Print out which episode we're on, useful for debugging.
@@ -172,22 +190,24 @@ def predire_valeurpi_mc(politique, env, nombre_episodes, gamma=1.0):
         episode = []
         etat = env.reset()
         for t in range(100):
-            action = politique(etat)
+            probabilites_actions = politique(etat)
+            action = np.random.choice(np.arange(len(probabilites_actions)), p=probabilites_actions)
             etat_suivant, recompense, final, _ = env.step(action)
             episode.append((etat, action, recompense))
             if final:
                 break
             etat = etat_suivant
             
-        etats_episode = [etape[0] for etape in episode]
-        G=0
+        paires_etataction_episode = [(tuple(etape[0]), etape[1]) for etape in episode]
+        G=0          
         for t in range(len(episode)-1,-1,-1):
             G=gamma*G+episode[t][2]
             St = episode[t][0]
-            if St not in etats_episode[0:t]:
-                N[St]+=1
-                V[St]=V[St]+(G-V[St])/N[St]
-    return V
+            At = episode[t][1]
+            if (St,At) not in paires_etataction_episode[0:t]:
+                N[(St,At)]+=1
+                Q[St][At]=(Q[St][At])+(G-Q[St][At])/N[(St,At)]          
+    return Q, politique
 
 
 def politique_reste_20ou21(observation):
@@ -196,10 +216,16 @@ def politique_reste_20ou21(observation):
     """
     return 0 if observation[0] >= 20 else 1
 
-V_10000 = predire_valeurpi_mc(politique_reste_20ou21, env, nombre_episodes=10000)
-afficher_V(V_10000, titre="10 000 épisodes")
+Q,politique = politique_optimale_mc(env, nombre_episodes=500000,epsilon=0.1)
 
-V_500000 = predire_valeurpi_mc(politique_reste_20ou21, env, nombre_episodes=500000)
-afficher_V(V_500000, titre="500 000 épisodes")
+
+# Calculer et afficher la valeur de V calculée à partir de Q
+V = defaultdict(float)
+for etat, actions in Q.items():
+    V[etat] = np.max(actions)
+afficher_V(V, titre="500 000 épisodes")
+
+
+
 
 
