@@ -9,6 +9,7 @@ from gym import spaces
 from gym.utils import seeding
 import numpy as np
 from collections import defaultdict
+import itertools
 
 def cmp(a, b):
     return int((a > b)) - int((a < b))
@@ -107,6 +108,47 @@ class BlackjackEnv(gym.Env):
 import matplotlib
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D 
+from collections import namedtuple
+import pandas as pd
+
+EpisodeStats = namedtuple("Stats",["episode_lengths", "episode_rewards"])
+
+def plot_episode_stats(stats, smoothing_window=10, noshow=False):
+    # Plot the episode length over time
+    fig1 = plt.figure(figsize=(10,5))
+    plt.plot(stats.episode_lengths)
+    plt.xlabel("Episode")
+    plt.ylabel("Episode Length")
+    plt.title("Episode Length over Time")
+    if noshow:
+        plt.close(fig1)
+    else:
+        plt.show(fig1)
+
+    # Plot the episode reward over time
+    fig2 = plt.figure(figsize=(10,5))
+    rewards_smoothed = pd.Series(stats.episode_rewards).rolling(smoothing_window, min_periods=smoothing_window).mean()
+    plt.plot(rewards_smoothed)
+    plt.xlabel("Episode")
+    plt.ylabel("Episode Reward (Smoothed)")
+    plt.title("Episode Reward over Time (Smoothed over window size {})".format(smoothing_window))
+    if noshow:
+        plt.close(fig2)
+    else:
+        plt.show(fig2)
+
+    # Plot time steps and episode number
+    fig3 = plt.figure(figsize=(10,5))
+    plt.plot(np.cumsum(stats.episode_lengths), np.arange(len(stats.episode_lengths)))
+    plt.xlabel("Time Steps")
+    plt.ylabel("Episode")
+    plt.title("Episode per time step")
+    if noshow:
+        plt.close(fig3)
+    else:
+        plt.show(fig3)
+
+    return fig1, fig2, fig3
 
 def afficher_V(V, titre="Fonction valeur de la politique selon méthode de Monte Carlo première visite"):
     """
@@ -164,10 +206,9 @@ def contruire_politique_epsilon_vorace(Q, epsilon, nb_actions):
         return probabilites_actions
     return f_politique
 
-def politique_optimale_mc(env, nombre_episodes, gamma=1.0, epsilon=0.1):
+def politique_optimale_Q(env, nombre_episodes, gamma=1.0, alpha= 0.1, epsilon=0.1):
     """
-    Prédire la valeur de la politique par la métode de Monte Carlo première visite
-    Monte Carlo prediction algorithm. Calculates the value function
+    Prédire la valeur de la politique par la méthode Q
 
         politique: fonction pi
         env: environnement de type OpenAI gym
@@ -178,37 +219,40 @@ def politique_optimale_mc(env, nombre_episodes, gamma=1.0, epsilon=0.1):
         V: Dictionnaire(etat,valeur)
         The etat is a tuple and the value is a float.
     """
-    N = defaultdict(float)
+
+    statistiques = EpisodeStats(episode_lengths=np.zeros(nombre_episodes),episode_rewards=np.zeros(nombre_episodes))
+
     Q = defaultdict(lambda: np.zeros(env.action_space.n))
     politique = contruire_politique_epsilon_vorace(Q, epsilon, env.action_space.n)
     
-    for i_episode in range(1, nombre_episodes + 1):
+    for i_episode in range(nombre_episodes):
         # Print out which episode we're on, useful for debugging.
         if i_episode % 1000 == 0:
             print("\rEpisode {}/{}.".format(i_episode, nombre_episodes), end="")
 
-         # Un episode est un tableau de tules (etat, action, recompense)
-        episode = []
+         # Un episode est un tableau de tuples (etat, action, recompense)
         etat = env.reset()
-        for t in range(100):
+        for t in itertools.count():
             probabilites_actions = politique(etat)
             action = np.random.choice(np.arange(len(probabilites_actions)), p=probabilites_actions)
-            etat_suivant, recompense, final, _ = env.step(action)
-            episode.append((etat, action, recompense))
+
+            etat_suivant, recompense, final, _ = env.step(action)            
+            
+            # Mettre à jour les statistiques
+            statistiques.episode_rewards[i_episode] += recompense
+            statistiques.episode_lengths[i_episode] = t
+            
+            meilleure_action_suivante = np.argmax(Q[etat_suivant])
+            
+            cible = recompense+gamma*Q[etat_suivant][meilleure_action_suivante]
+            delta = cible-Q[etat][action]
+            Q[etat][action] += alpha*delta
+            
             if final:
                 break
             etat = etat_suivant
-            
-        paires_etataction_episode = [(tuple(etape[0]), etape[1]) for etape in episode]
-        G=0          
-        for t in range(len(episode)-1,-1,-1):
-            G=gamma*G+episode[t][2]
-            St = episode[t][0]
-            At = episode[t][1]
-            if (St,At) not in paires_etataction_episode[0:t]:
-                N[(St,At)]+=1
-                Q[St][At]=(Q[St][At])+(G-Q[St][At])/N[(St,At)]          
-    return Q, politique
+                
+    return Q,statistiques
 
 
 def politique_reste_20ou21(observation):
@@ -217,16 +261,20 @@ def politique_reste_20ou21(observation):
     """
     return 0 if observation[0] >= 20 else 1
 
-Q,politique = politique_optimale_mc(env, nombre_episodes=500000,epsilon=0.1)
-
+Q,statistiques = politique_optimale_Q(env, nombre_episodes=10000,gamma=1.0, alpha= 0.1, epsilon=0.1)
+plot_episode_stats(statistiques)
 
 # Calculer et afficher la valeur de V calculée à partir de Q
 V = defaultdict(float)
+somme=0
+nb=0
 for etat, actions in Q.items():
     V[etat] = np.max(actions)
+    somme+=V[etat]
+    nb+=1
+    
 afficher_V(V, titre="500 000 épisodes")
-
-
+print("Valeur moyenne:", somme/nb)
 
 
 
