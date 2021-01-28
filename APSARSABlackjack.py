@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Optimisation de politique avec méthode Monte Carlo première visite
-Politique epsilon-vorace
+Optimisation de politique avec algoritme de contrôle en politique SARSA
 Environnement Blackjack
 """
 import gym
@@ -114,6 +113,7 @@ import pandas as pd
 EpisodeStats = namedtuple("Stats",["episode_lengths", "episode_rewards"])
 
 def plot_episode_stats(stats, smoothing_window=10, noshow=False):
+    """ Tiré de :https://github.com/dennybritz/reinforcement-learning/blob/master/lib/plotting.py"""
     # Plot the episode length over time
     fig1 = plt.figure(figsize=(10,5))
     plt.plot(stats.episode_lengths)
@@ -153,8 +153,9 @@ def plot_episode_stats(stats, smoothing_window=10, noshow=False):
 def afficher_V(V, titre="Fonction valeur de la politique selon méthode de Monte Carlo première visite"):
     """
     Afficher V comme surface en 3D
+    Adapté de :https://github.com/dennybritz/reinforcement-learning/blob/master/lib/plotting.py
     
-    V : dictionnaire (etat, valeur)
+    V: Dictionnaire(etat:tuple,valeur:float)
     """
     # Déterminer les quadrillages des axes X et Y
     min_x = min(etat[0] for etat in V.keys()) # axe des x : main du joueur
@@ -188,24 +189,6 @@ def afficher_V(V, titre="Fonction valeur de la politique selon méthode de Monte
 
 env = BlackjackEnv()
 
-def contruire_politique_epsilon_vorace(Q, epsilon, nb_actions):
-    """
-    Creer une fonction qui calcule les probabilités d'une politique e-vorace
-    
-        Q: dictionnaire etat -> valeurs des actions (np.array de taille nb_actions)
-        epsilon: float entre 0 et 1
-        nb_actions: nombre d'actions de l'environnement
-    
-    Retourne une fonction qui prend un etat et retourne les probabilités d'actions e-vorace
-    
-    """
-    def f_politique(etat):
-        probabilites_actions = np.ones(nb_actions, dtype=float) * epsilon / nb_actions
-        meilleure_action = np.argmax(Q[etat])
-        probabilites_actions[meilleure_action] += (1.0 - epsilon)
-        return probabilites_actions
-    return f_politique
-
 def politique_optimale_sarsa(env, nombre_episodes, gamma=1.0, alpha= 0.1, epsilon=0.1):
     """
     Prédire la valeur de la politique par la métode de Monte Carlo première visite
@@ -223,7 +206,6 @@ def politique_optimale_sarsa(env, nombre_episodes, gamma=1.0, alpha= 0.1, epsilo
     statistiques = EpisodeStats(episode_lengths=np.zeros(nombre_episodes),episode_rewards=np.zeros(nombre_episodes))
 
     Q = defaultdict(lambda: np.zeros(env.action_space.n))
-    politique = contruire_politique_epsilon_vorace(Q, epsilon, env.action_space.n)
     
     for i_episode in range(nombre_episodes):
         # Print out which episode we're on, useful for debugging.
@@ -233,12 +215,22 @@ def politique_optimale_sarsa(env, nombre_episodes, gamma=1.0, alpha= 0.1, epsilo
          # Un episode est un tableau de tules (etat, action, recompense)
             
         etat = env.reset()
-        probabilites_actions = politique(etat)
+        
+        # Choisir action selon politique e-vorace
+        probabilites_actions = np.ones(env.action_space.n, dtype=float) * epsilon / env.action_space.n
+        meilleure_action = np.argmax(Q[etat])
+        probabilites_actions[meilleure_action] += (1.0 - epsilon)
+        
         action = np.random.choice(np.arange(len(probabilites_actions)), p=probabilites_actions)
         for t in itertools.count():
 
-            etat_suivant, recompense, final, _ = env.step(action)            
-            probabilites_actions_suivant = politique(etat_suivant)
+            etat_suivant, recompense, final, _ = env.step(action)
+            
+            # Choisir action suivante selon politique e-vorace
+            probabilites_actions_suivant = np.ones(env.action_space.n, dtype=float) * epsilon / env.action_space.n
+            meilleure_action_suivante = np.argmax(Q[etat_suivant])
+            probabilites_actions_suivant[meilleure_action_suivante] += (1.0 - epsilon)
+
             action_suivante = np.random.choice(np.arange(len(probabilites_actions_suivant)), p=probabilites_actions_suivant)
             
             # Mettre à jour les statistiques
@@ -248,7 +240,6 @@ def politique_optimale_sarsa(env, nombre_episodes, gamma=1.0, alpha= 0.1, epsilo
             cible = recompense+gamma*Q[etat_suivant][action_suivante]
             delta = cible-Q[etat][action]
             Q[etat][action] += alpha*delta
-            
             if final:
                 break
             etat = etat_suivant
@@ -256,14 +247,7 @@ def politique_optimale_sarsa(env, nombre_episodes, gamma=1.0, alpha= 0.1, epsilo
                 
     return Q,statistiques
 
-
-def politique_reste_20ou21(observation):
-    """
-    Politique simple : le joueur reste à 20 ou 21, carte sinon
-    """
-    return 0 if observation[0] >= 20 else 1
-
-Q,statistiques = politique_optimale_sarsa(env, nombre_episodes=10000,gamma=1.0, alpha= 0.1, epsilon=0.1)
+Q,statistiques = politique_optimale_sarsa(env, nombre_episodes=100000,gamma=1.0, alpha= 0.01, epsilon=0.1)
 plot_episode_stats(statistiques)
 
 # Calculer et afficher la valeur de V calculée à partir de Q
@@ -271,12 +255,10 @@ V = defaultdict(float)
 somme=0
 nb=0
 for etat, actions in Q.items():
-    V[etat] = np.max(actions)
-    somme+=V[etat]
-    nb+=1
+    if etat[0]<22:
+        V[etat] = np.max(actions)
+        somme+=V[etat]
+        nb+=1
     
 afficher_V(V, titre="500 000 épisodes")
 print("Valeur moyenne:", somme/nb)
-
-
-

@@ -234,6 +234,7 @@ def politique_optimale_sarsa(env, nombre_episodes, gamma=1.0, alpha= 0.1, epsilo
             # Mettre à jour les statistiques
             statistiques.episode_rewards[i_episode] += recompense
             statistiques.episode_lengths[i_episode] = t
+            print(t,recompense)
             
             cible = recompense+gamma*Q[etat_suivant][action_suivante]
             delta = cible-Q[etat][action]
