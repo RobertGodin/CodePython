@@ -21,10 +21,6 @@ import torchvision.transforms as T
 random.seed(42)
 env = gym.make('CartPole-v0').unwrapped
 
-# Déterminer si un GPU est disponible
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print('Entrainement sur ',device)
-
 Observation = namedtuple('Observation',
                         ('etat', 'action', 'etat_suivant', 'recompense'))
 class HistoriqueObservations(object):
@@ -111,7 +107,7 @@ def chercher_ecran():
     ecran = np.ascontiguousarray(ecran, dtype=np.float32) / 255
     ecran = torch.from_numpy(ecran)
     # transformer_image_ecran, et ajouter dimension pour mini_lot (mini_lot,canal,largeur,hauteur)
-    return transformer_image_ecran(ecran).unsqueeze(0).to(device)
+    return transformer_image_ecran(ecran).unsqueeze(0)
 
 env.reset()
 plt.figure()
@@ -125,10 +121,8 @@ _, _, hauteur_ecran, largeur_ecran = ecran_initial.shape
 
 # Initaliser le RNAQ et RNACible
 n_actions = env.action_space.n
-rnaq = RNAQ(hauteur_ecran, largeur_ecran, n_actions).to(device)
-rnaq_cible = RNAQ(hauteur_ecran, largeur_ecran, n_actions).to(device)
-rnaq_cible.load_state_dict(rnaq.state_dict())
-rnaq_cible.eval()
+rnaq = RNAQ(hauteur_ecran, largeur_ecran, n_actions)
+
 optimiseur = optim.RMSprop(rnaq.parameters())
 liste_observations = HistoriqueObservations(10000)
 
@@ -141,21 +135,21 @@ def choisir_action(etat,epsilon):
         with torch.no_grad():
             return rnaq(etat).max(1)[1].view(1, 1)
     else:
-        return torch.tensor([[random.randrange(n_actions)]], device=device, dtype=torch.long)
+        return torch.tensor([[random.randrange(n_actions)]],dtype=torch.long)
 
 durees_par_episode = []
 
-def afficher_longueur_episode(longueur_episode):
+def afficher_longueur_episode(longueur_episode, fenetre=10):
     """
     Afficher l'évolution des longueurs d'épisodes avec le temps
     """
     plt.figure(figsize=(12,6))
     plt.plot(longueur_episode,label="Longueur épisode")
-    longueur_moyenne_10=[longueur_episode[i:i+10].mean() for i in range(longueur_episode.shape[0]-10)]
-    plt.plot(np.arange(10,longueur_episode.shape[0]),longueur_moyenne_10,label="Moyenne mobile pour 10 derniers épisodes")
+    longueur_moyenne_fenetre=[longueur_episode[i:i+fenetre].mean() for i in range(longueur_episode.shape[0]-fenetre)]
+    plt.plot(np.arange(fenetre,longueur_episode.shape[0]),longueur_moyenne_fenetre,label="Moyenne mobile")
     plt.xlabel("Épisode")
     plt.ylabel("Longueur épisode")
-    plt.title("DQN (Deep Q-learning), Cartpole : évolution de la longueur d'épisode")
+    plt.title("DQN (Deep Q-learning), Cartpole : évolution de la longueur d'épisode, fenetre:"+str(fenetre))
     plt.legend(loc='upper left')
     plt.show()
 
@@ -168,7 +162,7 @@ def optimisation_RNAQ(taille_mini_lot = 128, gamma=1.0):
 
     # masque_non_final[i] est True si etat[i] n'est pas final
     masque_non_final = torch.tensor(tuple(map(lambda s: s is not None,
-                                          mini_lot.etat_suivant)), device=device, dtype=torch.bool)
+                                          mini_lot.etat_suivant)),dtype=torch.bool)
     non_final_etat_suivants = torch.cat([s for s in mini_lot.etat_suivant if s is not None])
     mini_lot_etats = torch.cat(mini_lot.etat)
     mini_lot_actions = torch.cat(mini_lot.action)
@@ -178,8 +172,8 @@ def optimisation_RNAQ(taille_mini_lot = 128, gamma=1.0):
     mini_lot_Q = rnaq(mini_lot_etats).gather(1, mini_lot_actions)
 
     # Calculer la valeur cible (R+maxQ) selon la politique cible (Q est 0 si état final)
-    mini_lot_Q_suivant = torch.zeros(taille_mini_lot, device=device)
-    mini_lot_Q_suivant[masque_non_final] = rnaq_cible(non_final_etat_suivants).max(1)[0].detach()
+    mini_lot_Q_suivant = torch.zeros(taille_mini_lot)
+    mini_lot_Q_suivant[masque_non_final] = rnaq(non_final_etat_suivants).max(1)[0].detach()
     mini_lot_Q_cibles = (mini_lot_Q_suivant * gamma) + mini_lot_recompenses
 
     # Calculer l'erreur Huber
@@ -210,7 +204,7 @@ def optimiser_DQN(env, nombre_episodes=20,  gamma=1.0, alpha=0.1, epsilon_max=1,
             compteur_action +=1
             action = choisir_action(etat,epsilon) # Sélectionner et exécuter l'action
             _, recompense, fin_episode, _ = env.step(action.item())
-            recompense = torch.tensor([recompense], device=device)
+            recompense = torch.tensor([recompense])
             # Produire l'état suivant
             ecran_precedent = ecran_actuel
             ecran_actuel = chercher_ecran()
@@ -226,18 +220,14 @@ def optimiser_DQN(env, nombre_episodes=20,  gamma=1.0, alpha=0.1, epsilon_max=1,
             if fin_episode:
                 longueur_episode[i_episode] = t
                 break
-        
-        # Mettre à jouer le RNAQcible selon FREQUENCE_MAJ_RNAQ_CIBLE 
-        if i_episode % frequence_maj_rnaq_cible == 0:
-            rnaq_cible.load_state_dict(rnaq.state_dict())
             
         print("\rEpisode {}/{}. Longueur:{}".format(i_episode+1, nombre_episodes, t), end="")
         sys.stdout.flush()
 
     return longueur_episode
 
-longueur_episode = optimiser_DQN(env, nombre_episodes=20,  gamma=0.999, alpha=0.1, epsilon_max=1, epsilon_min=0.05,
-                  epsilon_taux_decroissance = 0.01, frequence_maj_rnaq_cible=10)
+longueur_episode = optimiser_DQN(env, nombre_episodes=200,gamma=0.999,alpha=0.1,epsilon_max=1,epsilon_min=0.05,
+                  epsilon_taux_decroissance = 0.01,frequence_maj_rnaq_cible=10)
 
 env.close()
 
