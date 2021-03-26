@@ -42,6 +42,6 @@ for position_horizontale in range(0,LARGEUR_FENETRE-LARGEUR_BOT,VITESSE_DEPLACEM
     fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
     dessiner_bot(fenetre,position_horizontale,position_verticale,LARGEUR_BOT,HAUTEUR_BOT) # Dessiner le Bot
     pygame.display.flip() # Mettre à jour la fenêtre graphique
-    horloge.tick(60) # Pour animer avec 60 images pas seconde
+    horloge.tick(60) # Pour animer avec 60 images par seconde
  
 pygame.quit() # Terminer pygame

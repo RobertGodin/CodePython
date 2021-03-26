@@ -14,7 +14,7 @@ class BotAnime :
     """ Un objet représente un Bot qui est animé dans une fenêtre Pygame 
     
     Le Bot est inscrit dans le rectangle englobant défini par les variables d'objet
-    (x,y,largeur et hauteur). Il se déplace en diagonale selon vistesse_x et vitesse_y. 
+    (x,y,largeur et hauteur). Il se déplace en diagonale selon vitesse_x et vitesse_y. 
         x : int
         y : int
         largeur : int

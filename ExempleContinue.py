@@ -5,10 +5,10 @@ des entiers lus. Omettre les entiers négatifs. Exemple du continue.
 
 somme=0
 while True:
-    entierLu = int(input("Entrez un nombre entier, 0 pour terminer :"))
-    if entierLu > 0 :
-        somme = somme + entierLu
-    elif entierLu < 0:
+    entier_lu = int(input("Entrez un nombre entier, 0 pour terminer :"))
+    if entier_lu > 0 :
+        somme = somme + entier_lu
+    elif entier_lu < 0:
         continue
     else:
         break

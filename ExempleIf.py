@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+1# -*- coding: UTF-8 -*-
 """
 Created on Tue Apr 10 14:41:47 2018
 
@@ -6,9 +6,9 @@ Created on Tue Apr 10 14:41:47 2018
 Exemple simple illustrant l'énoncé if
 """
 
-unInt = int(input("entrez un nombre entier: "))
-if (unInt > 10):
-    print(unInt,"est plus grand que 10")
+un_int = int(input("entrez un nombre entier: "))
+if (un_int > 10):
+    print(un_int,"est plus grand que 10")
 else :
-    print(unInt,"est plus petit ou égal à 10")
+    print(un_int,"est plus petit ou égal à 10")
     
