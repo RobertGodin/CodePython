@@ -16,7 +16,7 @@ date_debut = '2010-01-01'
 date_fin = '2016-12-31'
 
 # User pandas_reader.data.DataReader to load the desired data. As simple as that.
-panel_data = data.DataReader('INPX', 'google', date_debut, date_fin)
+panel_data = data.DataReader('WIKI/AAPL', 'quandl', date_debut, date_fin)
 
 panel_data.to_frame().head(9)
 
