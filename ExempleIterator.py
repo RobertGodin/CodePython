@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 class SequenceSup0:
     """Représente la séquence des éléments supérieurs à 0"""
     def __init__(self, seq):
