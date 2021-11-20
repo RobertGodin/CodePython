@@ -37,6 +37,8 @@ plt.title("Temps moyen de la recherche")
 plt.legend(loc='upper left')
 plt.show()
 
+
+
 def recherche_lineaire_triee(element, liste_triee):
     """ Recherche linéaire améloirée. Suppose que la liste est triée.
         Retourne vrai si element est dans la liste, faux sinon

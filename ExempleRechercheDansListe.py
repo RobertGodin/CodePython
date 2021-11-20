@@ -22,6 +22,15 @@ if recherche_lineaire(element, liste):
 else:
     print("Element absent")
 
+liste = [ 7,5,10,1,25,8,20 ]
+element = 8
+print("------------- Recherche linéaire de ",element," dans ", liste)
+if recherche_lineaire(element, liste):
+    print("Element présent")
+else:
+    print("Element absent")
+
+
 def recherche_lineaire_triee(element, liste_triee):
     """ Recherche linéaire améloirée. Suppose que la liste est triée.
         Retourne vrai si element est dans la liste, faux sinon
