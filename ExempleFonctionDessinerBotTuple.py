@@ -5,7 +5,7 @@ Exemple de fonction dessiner_bot
 
 import pygame
 
-def dessiner_bot(fenetre,x,y,largeur,hauteur):
+def dessiner_bot(fenetre,r):
     """ Dessiner un Bot. 
     
     Le Bot est inscrit dans le rectangle englobant défini par les paramètres
@@ -19,6 +19,7 @@ def dessiner_bot(fenetre,x,y,largeur,hauteur):
     VERT = (0,255,0)
     
     # Dessiner le Bot relativement au rectangle englobant
+    x,y,largeur,hauteur = r.x,r.y,r.width,r.height
     pygame.draw.ellipse(fenetre, VERT, ((x,y),(largeur, hauteur/2))) # Dessiner la tête
     pygame.draw.rect(fenetre, NOIR, ((x+largeur/4,y+hauteur/8),(largeur/10,hauteur/20))) # L'oeil gauche
     pygame.draw.rect(fenetre, NOIR, ((x+largeur*3/4-largeur/10,y+hauteur/8),(largeur/10,hauteur/20))) # L'oeil droit
@@ -35,8 +36,8 @@ BLANC = (255,255,255)
 fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
 
 # Dessiner deux Bots en appelant la fonction à deux reprises
-dessiner_bot(fenetre,100,100,200,400)
-dessiner_bot(fenetre,25,50,100,200)
+dessiner_bot(fenetre,pygame.Rect((100,100),(200,400)))
+dessiner_bot(fenetre,pygame.Rect((25,50),(100,200)))
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 input("Entrez fin de ligne pour terminer")

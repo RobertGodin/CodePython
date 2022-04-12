@@ -11,6 +11,6 @@ for indice in range(5):
 moyenne = somme / 5
 print('La moyenne est :',moyenne)
 print('Liste des entiers lus supérieurs à la moyenne :')
-for indice in range(5):
-    if liste_de_int[indice] > moyenne :
-        print(liste_de_int[indice])
+for un_int in liste_de_int:
+    if un_int> moyenne :
+        print(un_int)

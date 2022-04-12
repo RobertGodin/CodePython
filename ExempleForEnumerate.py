@@ -1,20 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Lire une chaîne et vérifier si 'a' est dans la chaîne avec un for
+Lire une chaîne et vérifier si 'a' est dans la chaîne. 
+Afficher la position en passant par un for avec enumerate.
 """
 
 une_chaine = input("Entrez une chaîne de caractères :")
 trouve = False
-for un_caractere in une_chaine :
-    if un_caractere == 'a' :
-        trouve = True
-        break
-print(trouve)
-
-
-trouve = False
-
-print(enumerate(une_chaine))
 
 for indice, un_caractere in enumerate(une_chaine) :
     if un_caractere == 'a' :

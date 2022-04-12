@@ -1,27 +1,27 @@
 # -*- coding: utf-8 -*-
 """
-Exemple de fonction dessiner_bot avec paramètre optionnel et valeur de défaut
+Exemple de fonction dessiner_bot
 """
 
 import pygame
 
-VERT = (0,255,0)    
-ROUGE = (255,0,0)
-
-def dessiner_bot(fenetre,r,couleur_tete = VERT,couleur_corps = ROUGE):
+def dessiner_bot(fenetre,r):
     """ Dessiner un Bot. 
     
     fenetre : la surface de dessin
     r : rectangle englobant de type pygame.Rect
     """
+
+    ROUGE = (255,0,0)
     NOIR = (0,0,0)
+    VERT = (0,255,0)
     
     # Dessiner le Bot relativement au rectangle englobant r
-    pygame.draw.ellipse(fenetre, couleur_tete, ((r.x,r.y),(r.width, r.height/2))) # Dessiner la tête
+    pygame.draw.ellipse(fenetre, VERT, ((r.x,r.y),(r.width, r.height/2))) # Dessiner la tête
     pygame.draw.rect(fenetre, NOIR, ((r.x+r.width/4,r.y+r.height/8),(r.width/10,r.height/20))) # L'oeil gauche
     pygame.draw.rect(fenetre, NOIR, ((r.x+r.width*3/4-r.width/10,r.y+r.height/8),(r.width/10,r.height/20))) # L'oeil droit
     pygame.draw.line(fenetre, NOIR, (r.x+r.width/4,r.y+r.height*3/8),(r.x+r.width*3/4,r.y+r.height*3/8), 2) # La bouche
-    pygame.draw.rect(fenetre, couleur_corps, ((r.x,r.y+r.height/2),(r.width,r.height/2))) # Le corps
+    pygame.draw.rect(fenetre, ROUGE, ((r.x,r.y+r.height/2),(r.width,r.height/2))) # Le corps
     
 pygame.init() # Initialiser Pygame
 LARGEUR_FENETRE = 400
@@ -32,12 +32,9 @@ pygame.display.set_caption('Exemple de dessin du Bot dans un rectangle englobant
 BLANC = (255,255,255)
 fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
 
-# Variantes d'appel de fonction avec paramètres optionnels
-dessiner_bot(fenetre,pygame.Rect((25,50),(100,200))) # Employer valeurs de défaut
-BLEU = (0,0,255)
-dessiner_bot(fenetre,pygame.Rect((25,350),(75,150)),couleur_tete = BLEU) # Spécifier une couleur pour la tete
-dessiner_bot(fenetre, pygame.Rect((250,75),(100,200)),couleur_corps = BLEU) # Spécifier une couleur pour le corps
-dessiner_bot(fenetre, pygame.Rect((250,300),(75,150)),couleur_corps = BLEU,couleur_tete = ROUGE) # Spécifier les deux 
+# Dessiner deux Bots en appelant la fonction à deux reprises
+dessiner_bot(fenetre,pygame.Rect((100,100),(200,400)))
+dessiner_bot(fenetre,pygame.Rect((25,50),(100,200)))
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 input("Entrez fin de ligne pour terminer")

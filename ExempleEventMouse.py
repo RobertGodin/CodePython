@@ -4,24 +4,22 @@ Exemple de détection d’évènement de souris
 """
 # Importer la librairie de pygame et initialiser 
 import pygame
-
-def dessiner_bot(fenetre,x,y,largeur,hauteur):
+    
+def dessiner_bot(fenetre,r):
     """ Dessiner un Bot. 
     
-    Le Bot est inscrit dans le rectangle englobant défini par les paramètres
-    (x,y,largeur et hauteur) dans une fenetre de Pygame
-    
     fenetre : la surface de dessin
-    x,y,largeur,hauteur : paramètres du rectangle englobant en pixels
+    r : rectangle englobant de type pygame.Rect
     """
     ROUGE = (255,0,0)
     NOIR = (0,0,0)
-    VERT = (0,255,0)    
-    pygame.draw.ellipse(fenetre, VERT, [x,y,largeur, hauteur/2]) # Dessiner la tête
-    pygame.draw.rect(fenetre, NOIR, [x+largeur/4,y+hauteur/8,largeur/10,hauteur/20]) # L'oeil gauche
-    pygame.draw.rect(fenetre, NOIR, [x+largeur*3/4-largeur/10,y+hauteur/8,largeur/10,hauteur/20]) # L'oeil droit
-    pygame.draw.line(fenetre, NOIR, [x+largeur/4,y+hauteur*3/8],[x+largeur*3/4,y+hauteur*3/8], 2) # La bouche
-    pygame.draw.rect(fenetre, ROUGE, [x,y+hauteur/2,largeur,hauteur/2]) # Le corps
+    VERT = (0,255,0)
+    # Dessiner le Bot relativement au rectangle englobant r
+    pygame.draw.ellipse(fenetre, VERT, ((r.x,r.y),(r.width, r.height/2))) # Dessiner la tête
+    pygame.draw.rect(fenetre, NOIR, ((r.x+r.width/4,r.y+r.height/8),(r.width/10,r.height/20))) # L'oeil gauche
+    pygame.draw.rect(fenetre, NOIR, ((r.x+r.width*3/4-r.width/10,r.y+r.height/8),(r.width/10,r.height/20))) # L'oeil droit
+    pygame.draw.line(fenetre, NOIR, (r.x+r.width/4,r.y+r.height*3/8),(r.x+r.width*3/4,r.y+r.height*3/8), 2) # La bouche
+    pygame.draw.rect(fenetre, ROUGE, ((r.x,r.y+r.height/2),(r.width,r.height/2))) # Le corps
 
 pygame.init() # Initialiser les modules de Pygame
 
@@ -45,7 +43,7 @@ while not fin:
         x=event.pos[0] # Position x de la souris
         y=event.pos[1] # Position y de la souris
         fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
-        dessiner_bot(fenetre,x-30/2,y-60/2,30,60) # Dessiner le Bot à la position de la souris
+        dessiner_bot(fenetre,pygame.Rect((x-30/2,y-60/2),(30,60))) # Dessiner le Bot à la position de la souris
         pygame.display.flip() # Mettre à jour la fenêtre graphique
  
 pygame.quit() # Terminer pygame
