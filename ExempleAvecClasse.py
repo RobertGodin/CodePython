@@ -13,93 +13,76 @@ ROSE = (255,100,100)
 class BotAnime :
     """ Un objet représente un Bot qui est animé dans une fenêtre Pygame 
     
-    Le Bot est inscrit dans le rectangle englobant défini par les variables d'objet
-    (x,y,largeur et hauteur). Il se déplace en diagonale selon vitesse_x et vitesse_y. 
-        x : int
-        y : int
-        largeur : int
-        hauteur : int
-        vitesse_x : int
-        vitesse_y : int
+    Le Bot est inscrit dans le rectangle englobant défini par r. Il se déplace en diagonale selon vitesse. 
+        r : pygame.Rect       Le rectangle englobant 
+        v : [int,int]   Vitesse de déplacement selon les deux axes x et y
     """
         
-    def __init__(self,x,y,largeur,hauteur,vitesse_x,vitesse_y):
-        self.x = x
-        self.y = y
-        self.largeur = largeur
-        self.hauteur = hauteur
-        self.vitesse_x = vitesse_x
-        self.vitesse_y = vitesse_y
+    def __init__(self,rectangle,vitesse):
+        self.r = rectangle
+        self.v = vitesse
         
     def dessiner(self,fenetre):
         """ Dessiner un Bot. 
     
-        Le Bot est inscrit dans le rectangle englobant défini par les variables d'objet
-        (x,y,largeur et hauteur) dans une fenetre de Pygame
+        Le Bot est inscrit dans le rectangle englobant défini par la variable d'objet r dans une fenetre de Pygame
         """
 
-        pygame.draw.ellipse(fenetre, VERT, [self.x,self.y,self.largeur, self.hauteur/2]) # Dessiner la tête
-        pygame.draw.rect(fenetre, NOIR, [self.x+self.largeur/4,self.y+self.hauteur/8,self.largeur/10,self.hauteur/20]) # L'oeil gauche
-        pygame.draw.rect(fenetre, NOIR, [self.x+self.largeur*3/4-self.largeur/10,self.y+self.hauteur/8,self.largeur/10,self.hauteur/20]) # L'oeil droit
-        pygame.draw.line(fenetre, NOIR, [self.x+self.largeur/4,self.y+self.hauteur*3/8],[self.x+self.largeur*3/4,self.y+self.hauteur*3/8], 2) # La bouche
-        pygame.draw.rect(fenetre, ROUGE, [self.x,self.y+self.hauteur/2,self.largeur,self.hauteur/2]) # Le corps
-        
+        pygame.draw.ellipse(fenetre, VERT, ((self.r.x,self.r.y),(self.r.width, self.r.height/2))) # Dessiner la tête
+        pygame.draw.rect(fenetre, NOIR, ((self.r.x+self.r.width/4,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil gauche
+        pygame.draw.rect(fenetre, NOIR, ((self.r.x+self.r.width*3/4-self.r.width/10,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil droit
+        pygame.draw.line(fenetre, NOIR, (self.r.x+self.r.width/4,self.r.y+self.r.height*3/8),(self.r.x+self.r.width*3/4,self.r.y+self.r.height*3/8), 2) # La bouche
+        pygame.draw.rect(fenetre, ROUGE, ((self.r.x,self.r.y+self.r.height/2),(self.r.width,self.r.height/2))) # Le corps
+
+
     def deplacer(self,largeur_fenetre,hauteur_fenetre):
         """ Déplacer le Bot en diagonale en rebondissant sur les bords de la fenetre"""
-        if self.x+self.vitesse_x > largeur_fenetre-self.largeur or self.x+self.vitesse_x < 0 :
-            self.vitesse_x = -self.vitesse_x # Inverser la direction en x    
-        self.x = self.x+self.vitesse_x
-        if self.y+self.vitesse_y > hauteur_fenetre-self.hauteur or self.y+self.vitesse_y < 0 :
-            self.vitesse_y = -self.vitesse_y # Inverser la direction en y    
-        self.y = self.y+self.vitesse_y
+        if self.r.x+self.v[0] > largeur_fenetre-self.r.width or self.r.x+self.v[0] < 0 :
+            self.v[0] = -self.v[0] # Inverser la direction en x    
+        self.r.x = self.r.x+self.v[0]
+        if self.r.y+self.v[1] > hauteur_fenetre-self.r.height or self.r.y+self.v[1] < 0 :
+            self.v[1] = -self.v[1] # Inverser la direction en y    
+        self.r.y = self.r.y+self.v[1]
     
 class ItiAnime :
     """ Un objet représente un Iti qui est animé dans une fenêtre Pygame 
     
-    Le Iti est inscrit dans le rectangle englobant défini par les variables d'objet
-    (x,y,largeur et hauteur). Il se déplace en diagonale selon vistesse_x et vitesse_y. 
-        x : int
-        y : int
-        largeur : int
-        hauteur : int
-        vitesse_x : int
-        vitesse_y : int
+    Le Iti est inscrit dans le rectangle englobant défini par rectangle. Il se déplace en diagonale selon vitesse. 
+        r : pygame.Rect       Le rectangle englobant 
+        v : [int,int]   Vitesse de déplacement selon les deux axes x et y
     """
-    def __init__(self,x,y,largeur,hauteur,vitesse_x,vitesse_y):
-        self.x = x
-        self.y = y
-        self.largeur = largeur
-        self.hauteur = hauteur
-        self.vitesse_x = vitesse_x
-        self.vitesse_y = vitesse_y
+        
+    def __init__(self,rectangle,vitesse):
+        self.r = rectangle
+        self.v = vitesse
         
     def dessiner(self,fenetre):
         """ Dessiner un Iti. 
     
-        Le Iti est inscrit dans le rectangle englobant défini par les variables d'objet
-        (x,y,largeur et hauteur) dans une fenetre de Pygame
+        Le Iti est inscrit dans le rectangle englobant défini par la variable d'objet r dans une fenetre de Pygame
         """
-        self.milieux = self.x + self.largeur/2;
-        self.milieuy = self.y + self.hauteur/2;
+        self.milieux = self.r.x + self.r.width/2;
+        self.milieuy = self.r.y + self.r.height/2;
 
-        pygame.draw.ellipse(fenetre, ROSE, [self.x+self.largeur/3,self.y,self.largeur/3,self.hauteur/4]) # Dessiner la tête
-        pygame.draw.arc(fenetre,NOIR,[self.milieux-self.largeur/12,self.y+self.hauteur/8,self.largeur/6,self.hauteur/14],3.1416,0,2) # Le sourire
-        pygame.draw.ellipse(fenetre, NOIR, [self.milieux-self.largeur/8,self.y+self.hauteur/12,self.largeur/12,self.hauteur/24]) # L'oeil gauche
-        pygame.draw.ellipse(fenetre, NOIR, [self.milieux+self.largeur/8-self.largeur/12,self.y+self.hauteur/12,self.largeur/12,self.hauteur/24]) # L'oeil droit
-        pygame.draw.line(fenetre, NOIR, [self.milieux,self.y+self.hauteur/4],[self.milieux,self.y+self.hauteur*3/4], 2) # Le corps
-        pygame.draw.line(fenetre, NOIR, [self.x,self.y+self.hauteur/4],[self.milieux,self.milieuy], 2) # Bras gauche
-        pygame.draw.line(fenetre, NOIR, [self.x+self.largeur,self.y+self.hauteur/4],[self.milieux,self.milieuy], 2) # Bras droit
-        pygame.draw.line(fenetre, NOIR, [self.x,self.y+self.hauteur],[self.milieux,self.y+self.hauteur*3/4], 2) # Jambe gauche
-        pygame.draw.line(fenetre, NOIR, [self.x+self.largeur,self.y+self.hauteur],[self.milieux,self.y+self.hauteur*3/4], 2) # Jambe droite
-        
+        pygame.draw.ellipse(fenetre, ROSE, ((self.r.x+self.r.width/3,self.r.y),(self.r.width/3,self.r.height/4))) # Dessiner la tête
+        pygame.draw.arc(fenetre,NOIR,((self.milieux-self.r.width/12,self.r.y+self.r.height/8),(self.r.width/6,self.r.height/14)),3.1416,0,2) # Le sourire
+        pygame.draw.ellipse(fenetre, NOIR, ((self.milieux-self.r.width/8,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil gauche
+        pygame.draw.ellipse(fenetre, NOIR, ((self.milieux+self.r.width/8-self.r.width/12,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil droit
+        pygame.draw.line(fenetre, NOIR, (self.milieux,self.r.y+self.r.height/4),(self.milieux,self.r.y+self.r.height*3/4), 2) # Le corps
+        pygame.draw.line(fenetre, NOIR, (self.r.x,self.r.y+self.r.height/4),(self.milieux,self.milieuy), 2) # Bras gauche
+        pygame.draw.line(fenetre, NOIR, (self.r.x+self.r.width,self.r.y+self.r.height/4),(self.milieux,self.milieuy), 2) # Bras droit
+        pygame.draw.line(fenetre, NOIR, (self.r.x,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe gauche
+        pygame.draw.line(fenetre, NOIR, (self.r.x+self.r.width,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe droite
+
+
     def deplacer(self,largeur_fenetre,hauteur_fenetre):
         """ Déplacer le Iti en diagonale en rebondissant sur les bords de la fenetre"""
-        if self.x+self.vitesse_x > largeur_fenetre-self.largeur or self.x+self.vitesse_x < 0 :
-            self.vitesse_x = -self.vitesse_x # Inverser la direction en x    
-        self.x = self.x+self.vitesse_x
-        if self.y+self.vitesse_y > hauteur_fenetre-self.hauteur or self.y+self.vitesse_y < 0 :
-            self.vitesse_y = -self.vitesse_y # Inverser la direction en y    
-        self.y = self.y+self.vitesse_y
+        if self.r.x+self.v[0] > largeur_fenetre-self.r.width or self.r.x+self.v[0] < 0 :
+            self.v[0] = -self.v[0] # Inverser la direction en x    
+        self.r.x = self.r.x+self.v[0]
+        if self.r.y+self.v[1] > hauteur_fenetre-self.r.height or self.r.y+self.v[1] < 0 :
+            self.v[1] = -self.v[1] # Inverser la direction en y    
+        self.r.y = self.r.y+self.v[1]
 
 pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
@@ -111,10 +94,10 @@ BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
 # Création de deux BotAnime et deux ItiAnime
-bot1 = BotAnime(0,0,20,40,5,10)
-bot2 = BotAnime(100,200,30,60,10,2)
-iti1 = ItiAnime(200,150,40,80,3,3)
-iti2 = ItiAnime(300,300,50,100,5,10)
+bot1 = BotAnime(pygame.Rect((0,0),(20,40)),[5,10])
+bot2 = BotAnime(pygame.Rect((100,200),(30,60)),[0,2])
+iti1 = ItiAnime(pygame.Rect((200,150),(40,80)),[3,3])
+iti2 = ItiAnime(pygame.Rect((300,300),(50,100)),[5,10])
 
 # Boucle d'animation
 fin = False

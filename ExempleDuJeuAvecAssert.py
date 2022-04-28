@@ -3,25 +3,25 @@
 Exemple de jeu avec assert: programme principal
 """
 import EntiteDuJeuAssert
-import pygame
+# -*- coding: utf-8 -*-
 
+import pygame
 pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
 fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre 
 EntiteDuJeuAssert.EntiteAnimeeAvecSon.set_fenetre(fenetre)
 pygame.display.set_caption("Exemple de jeu avec module EntiteDuJeu")
-
 BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
 # Création de la liste des entités du jeu
 liste_entite = []
 try :
-    liste_entite.append(EntiteDuJeuAssert.BotAnime(10,100,40,80,3,3,"Son2.wav"))
-    liste_entite.append(EntiteDuJeuAssert.BotAnime(200,200,50,100,0,2,"Son2.wav"))
-    liste_entite.append(EntiteDuJeuAssert.ItiAnimeVolant(200,50,50,100,3,0,"Son3.wav",3))
-    liste_entite.append(EntiteDuJeuAssert.EntiteAnimeeParImages(50,100,100,100,5,5,"Son4.wav",9,"coq"))
+    liste_entite.append(EntiteDuJeuAssert.BotAnime(pygame.Rect((10,100),(40,80)),[3,3],"Son2.wav"))
+    liste_entite.append(EntiteDuJeuAssert.BotAnime(pygame.Rect((200,200),(50,100)),[0,2],"Son2.wav"))
+    liste_entite.append(EntiteDuJeuAssert.ItiAnimeVolant(pygame.Rect((200,50),(50,100)),[3,0],"Son3.wav",3))
+    liste_entite.append(EntiteDuJeuAssert.EntiteAnimeeParImages(pygame.Rect((50,100),(100,100)),[5,5],"Son4.wav",9,"coq"))
 except EntiteDuJeuAssert.CoordonneesEntiteErreur as e :
     print("Les coordonnées de l'entité dépassent la taille de la fenetre",e)
 except EntiteDuJeuAssert.TailleExcessiveErreur as e :
@@ -30,7 +30,6 @@ except :
     print("Une exception a été levée lors de la création des entités du jeu")
     raise
 else :
-
     # Boucle d'animation
     fin = False
     while not fin :
@@ -45,15 +44,15 @@ else :
                     if une_entite.touche(x,y):
                         une_entite.emettre_son()
                         liste_entite.remove(une_entite)
-                    
+                        
             for une_entite in liste_entite :
                 une_entite.prochaine_scene()
-        
+            
             fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
             for une_entite in liste_entite :
                 une_entite.dessiner()
-
+    
             pygame.display.flip() # Mettre à jour la fenêtre graphique
             horloge.tick(60) # Pour animer avec 60 images pas seconde
-finally : 
+finally:
     pygame.quit() # Terminer pygame

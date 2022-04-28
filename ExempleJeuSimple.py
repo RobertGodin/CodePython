@@ -17,10 +17,10 @@ horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
 # Création de la liste des entités du jeu
 liste_entite = []
-liste_entite.append(EntiteDuJeu.BotAnime(10,100,40,80,3,3,"Son2.wav"))
-liste_entite.append(EntiteDuJeu.BotAnime(200,200,50,100,0,2,"Son2.wav"))
-liste_entite.append(EntiteDuJeu.ItiAnimeVolant(200,50,50,100,3,0,"Son3.wav",3))
-liste_entite.append(EntiteDuJeu.EntiteAnimeeParImages(50,100,100,100,5,5,"Son4.wav",9,"coq"))
+liste_entite.append(EntiteDuJeu.BotAnime(pygame.Rect((10,100),(40,80)),[3,3],"Son2.wav"))
+liste_entite.append(EntiteDuJeu.BotAnime(pygame.Rect((200,200),(50,100)),[0,2],"Son2.wav"))
+liste_entite.append(EntiteDuJeu.ItiAnimeVolant(pygame.Rect((200,50),(50,100)),[3,0],"Son3.wav",3))
+liste_entite.append(EntiteDuJeu.EntiteAnimeeParImages(pygame.Rect((50,100),(100,100)),[5,5],"Son4.wav",9,"coq"))
 
 # Boucle d'animation
 fin = False

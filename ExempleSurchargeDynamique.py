@@ -3,9 +3,7 @@
 Exemple d'animation d'entités : création d'une super classe EntiteAnime et
 appel des méthodes d'animation des entités par itération et surcharge dynamique
 """
-# Importer la librairie de pygame et initialiser 
 import pygame
-
 ROUGE = (255,0,0)
 NOIR = (0,0,0)
 VERT = (0,255,0)    
@@ -14,104 +12,89 @@ ROSE = (255,100,100)
 class EntiteAnimee :
     """ Un objet représente une entité qui est animée dans une fenêtre Pygame 
     
-    L'entité est inscrite dans le rectangle englobant défini par les variables d'objet
-    (x,y,largeur et hauteur). Elle se déplace en diagonale selon vitesse_x et vitesse_y. 
-        x : int
-        y : int
-        largeur : int
-        hauteur : int
-        vitesse_x : int
-        vitesse_y : int
+    L'entité est inscrite dans le rectangle englobant défini par r. Il se déplace en diagonale selon la vitesse v. 
+        r : pygame.Rect       Le rectangle englobant 
+        v : [int,int]         Vitesse de déplacement selon les deux axes x et y
     """
+
     @staticmethod
-    def set_fenetre(f):
-        """ Fixer les variables de classe fenetre, largeur_fenetre et hauteur_fenetre
+    def set_fenetre(fenetre):
+        """ Fixer la variable de classe f qui représente la fenetre graphique
         
             fenetre : pygame.Surface
-            largeur_fenetre : int
-            hauteur_fenetre : int
         """
-        EntiteAnimee.fenetre = f
-        EntiteAnimee.largeur_fenetre = f.get_width()
-        EntiteAnimee.hauteur_fenetre = f.get_height()
-  
-    def __init__(self,x,y,largeur,hauteur,vitesse_x,vitesse_y):
-        self.x = x
-        self.y = y
-        self.largeur = largeur
-        self.hauteur = hauteur
-        self.vitesse_x = vitesse_x
-        self.vitesse_y = vitesse_y
-        
+        EntiteAnimee.f = fenetre
+
+    def __init__(self,rectangle,vitesse):
+        self.r = rectangle
+        self.v = vitesse
+
     def deplacer(self):
-        """ Déplacer l'entité en diagonale en rebondissant sur les bords de la fenetre"""
-        if self.x+self.vitesse_x > EntiteAnimee.largeur_fenetre-self.largeur or self.x+self.vitesse_x < 0 :
-            self.vitesse_x = -self.vitesse_x # Inverser la direction en x    
-        self.x = self.x+self.vitesse_x
-        if self.y+self.vitesse_y > EntiteAnimee.hauteur_fenetre-self.hauteur or self.y+self.vitesse_y < 0 :
-            self.vitesse_y = -self.vitesse_y # Inverser la direction en y    
-        self.y = self.y+self.vitesse_y
+        """ Déplacer selon self.v en diagonale en rebondissant sur les bords de la fenetre"""
+        if self.r.x+self.v[0] > EntiteAnimee.f.get_width()-self.r.width or self.r.x+self.v[0] < 0 :
+            self.v[0] = -self.v[0] # Inverser la direction en x    
+        self.r.x = self.r.x+self.v[0]
+        if self.r.y+self.v[1] > EntiteAnimee.f.get_height()-self.r.height or self.r.y+self.v[1] < 0 :
+            self.v[1] = -self.v[1] # Inverser la direction en y    
+        self.r.y = self.r.y+self.v[1]
 
 class BotAnime(EntiteAnimee) :
-    """ Un objet représente un Bot qui est animé dans une fenêtre Pygame 
-        Sous-classe de EntiteAnime
+    """ Un objet représente un Bot qui est animé dans une fenêtre Pygame
+        Sous-classe de EntiteAnimee
     """
-
+        
     def dessiner(self):
         """ Dessiner un Bot. 
     
-        Le Bot est inscrit dans le rectangle englobant défini par les variables d'objet
-        (x,y,largeur et hauteur) dans une fenetre de Pygame
+        Le Bot est inscrit dans le rectangle englobant défini par la variable d'objet r dans une fenetre de Pygame
         """
 
-        pygame.draw.ellipse(BotAnime.fenetre, VERT, [self.x,self.y,self.largeur, self.hauteur/2]) # Dessiner la tête
-        pygame.draw.rect(BotAnime.fenetre, NOIR, [self.x+self.largeur/4,self.y+self.hauteur/8,self.largeur/10,self.hauteur/20]) # L'oeil gauche
-        pygame.draw.rect(BotAnime.fenetre, NOIR, [self.x+self.largeur*3/4-self.largeur/10,self.y+self.hauteur/8,self.largeur/10,self.hauteur/20]) # L'oeil droit
-        pygame.draw.line(BotAnime.fenetre, NOIR, [self.x+self.largeur/4,self.y+self.hauteur*3/8],[self.x+self.largeur*3/4,self.y+self.hauteur*3/8], 2) # La bouche
-        pygame.draw.rect(BotAnime.fenetre, ROUGE, [self.x,self.y+self.hauteur/2,self.largeur,self.hauteur/2]) # Le corps
-        
-    
+        pygame.draw.ellipse(BotAnime.f, VERT, ((self.r.x,self.r.y),(self.r.width, self.r.height/2))) # Dessiner la tête
+        pygame.draw.rect(BotAnime.f, NOIR, ((self.r.x+self.r.width/4,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil gauche
+        pygame.draw.rect(BotAnime.f, NOIR, ((self.r.x+self.r.width*3/4-self.r.width/10,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil droit
+        pygame.draw.line(BotAnime.f, NOIR, (self.r.x+self.r.width/4,self.r.y+self.r.height*3/8),(self.r.x+self.r.width*3/4,self.r.y+self.r.height*3/8), 2) # La bouche
+        pygame.draw.rect(BotAnime.f, ROUGE, ((self.r.x,self.r.y+self.r.height/2),(self.r.width,self.r.height/2))) # Le corps
+
+
 class ItiAnime(EntiteAnimee) :
-    """ Un objet représente un Iti qui est animé dans une fenêtre Pygame 
-        Sous-classe de EntiteAnime    
+    """ Un objet représente un Bot qui est animé dans une fenêtre Pygame 
+        Sous-classe de EntiteAnimee
     """
-    
+        
     def dessiner(self):
         """ Dessiner un Iti. 
     
-        Le Iti est inscrit dans le rectangle englobant défini par les variables d'objet
-        (x,y,largeur et hauteur) dans une fenetre de Pygame
+        Le Iti est inscrit dans le rectangle englobant défini par la variable d'objet r dans une fenetre de Pygame
         """
-        self.milieux = self.x + self.largeur/2;
-        self.milieuy = self.y + self.hauteur/2;
+        self.milieux = self.r.x + self.r.width/2;
+        self.milieuy = self.r.y + self.r.height/2;
 
-        pygame.draw.ellipse(ItiAnime.fenetre, ROSE, [self.x+self.largeur/3,self.y,self.largeur/3,self.hauteur/4]) # Dessiner la tête
-        pygame.draw.arc(ItiAnime.fenetre,NOIR,[self.milieux-self.largeur/12,self.y+self.hauteur/8,self.largeur/6,self.hauteur/14],3.1416,0,2) # Le sourire
-        pygame.draw.ellipse(ItiAnime.fenetre, NOIR, [self.milieux-self.largeur/8,self.y+self.hauteur/12,self.largeur/12,self.hauteur/24]) # L'oeil gauche
-        pygame.draw.ellipse(ItiAnime.fenetre, NOIR, [self.milieux+self.largeur/8-self.largeur/12,self.y+self.hauteur/12,self.largeur/12,self.hauteur/24]) # L'oeil droit
-        pygame.draw.line(ItiAnime.fenetre, NOIR, [self.milieux,self.y+self.hauteur/4],[self.milieux,self.y+self.hauteur*3/4], 2) # Le corps
-        pygame.draw.line(ItiAnime.fenetre, NOIR, [self.x,self.y+self.hauteur/4],[self.milieux,self.milieuy], 2) # Bras gauche
-        pygame.draw.line(ItiAnime.fenetre, NOIR, [self.x+self.largeur,self.y+self.hauteur/4],[self.milieux,self.milieuy], 2) # Bras droit
-        pygame.draw.line(ItiAnime.fenetre, NOIR, [self.x,self.y+self.hauteur],[self.milieux,self.y+self.hauteur*3/4], 2) # Jambe gauche
-        pygame.draw.line(ItiAnime.fenetre, NOIR, [self.x+self.largeur,self.y+self.hauteur],[self.milieux,self.y+self.hauteur*3/4], 2) # Jambe droite
-        
+        pygame.draw.ellipse(ItiAnime.f, ROSE, ((self.r.x+self.r.width/3,self.r.y),(self.r.width/3,self.r.height/4))) # Dessiner la tête
+        pygame.draw.arc(ItiAnime.f,NOIR,((self.milieux-self.r.width/12,self.r.y+self.r.height/8),(self.r.width/6,self.r.height/14)),3.1416,0,2) # Le sourire
+        pygame.draw.ellipse(ItiAnime.f, NOIR, ((self.milieux-self.r.width/8,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil gauche
+        pygame.draw.ellipse(ItiAnime.f, NOIR, ((self.milieux+self.r.width/8-self.r.width/12,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil droit
+        pygame.draw.line(ItiAnime.f, NOIR, (self.milieux,self.r.y+self.r.height/4),(self.milieux,self.r.y+self.r.height*3/4), 2) # Le corps
+        pygame.draw.line(ItiAnime.f, NOIR, (self.r.x,self.r.y+self.r.height/4),(self.milieux,self.milieuy), 2) # Bras gauche
+        pygame.draw.line(ItiAnime.f, NOIR, (self.r.x+self.r.width,self.r.y+self.r.height/4),(self.milieux,self.milieuy), 2) # Bras droit
+        pygame.draw.line(ItiAnime.f, NOIR, (self.r.x,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe gauche
+        pygame.draw.line(ItiAnime.f, NOIR, (self.r.x+self.r.width,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe droite
 
 pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
 fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre 
 EntiteAnimee.set_fenetre(fenetre)
-pygame.display.set_caption("Exemple des Bots et Itis en diagonale avec super-classe EntiteAnime")
+pygame.display.set_caption("Exemple des Bots et Itis animés en diagonale avec super-classe EntiteAnimee") # Définir le titre dans le haut de la fenêtre
 
 BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
-# Création de deux BotAnime et deux ItiAnime
+# Placer deux BotAnime et deux ItiAnime dans la liste des entités
 liste_entite = []
-liste_entite.append(BotAnime(0,0,20,40,5,10))
-liste_entite.append(BotAnime(100,200,30,60,10,2))
-liste_entite.append(ItiAnime(200,150,40,80,3,3))
-liste_entite.append(ItiAnime(300,300,50,100,5,10))
+liste_entite.append(BotAnime(pygame.Rect((0,0),(20,40)),[5,10]))
+liste_entite.append(BotAnime(pygame.Rect((100,200),(30,60)),[0,2]))
+liste_entite.append(ItiAnime(pygame.Rect((200,150),(40,80)),[3,3]))
+liste_entite.append(ItiAnime(pygame.Rect((300,300),(50,100)),[5,10]))
 
 # Boucle d'animation
 fin = False

@@ -1,28 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-Exemple de jeu avec exceptions: programme principal
+Exemple de jeu : programme principal
 """
-import EntiteDuJeuAvecException
+import EntiteDuJeuAvecExceptionRefactorise
 import pygame
+
 pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
 fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre 
-EntiteDuJeuAvecException.EntiteAnimeeAvecSon.set_fenetre(fenetre)
+EntiteDuJeuAvecExceptionRefactorise.EntiteAnimeeAvecSon.set_fenetre(fenetre)
 pygame.display.set_caption("Exemple de jeu avec module EntiteDuJeu")
+
 BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
 # Création de la liste des entités du jeu
 liste_entite = []
+
 try :
-    liste_entite.append(EntiteDuJeuAvecException.BotAnime(pygame.Rect((10,100),(40,80)),[3,3],"Son2.wav"))
-    liste_entite.append(EntiteDuJeuAvecException.BotAnime(pygame.Rect((200,200),(50,100)),[0,2],"Son2.wav"))
-    liste_entite.append(EntiteDuJeuAvecException.ItiAnimeVolant(pygame.Rect((200,50),(50,100)),[3,0],"Son3.wav",3))
-    liste_entite.append(EntiteDuJeuAvecException.EntiteAnimeeParImages(pygame.Rect((50,100),(100,100)),[5,5],"Son4.wav",9,"coq"))
-except EntiteDuJeuAvecException.CoordonneesEntiteErreur as e :
+    liste_entite.append(EntiteDuJeuAvecExceptionRefactorise.BotAnime(pygame.Rect((10,100),(40,80)),[3,3],"Son2.wav"))
+    liste_entite.append(EntiteDuJeuAvecExceptionRefactorise.BotAnime(pygame.Rect((200,200),(50,100)),[0,2],"Son2.wav"))
+    liste_entite.append(EntiteDuJeuAvecExceptionRefactorise.ItiAnimeVolant(pygame.Rect((200,50),(50,100)),[3,0],"Son3.wav",3))
+    liste_entite.append(EntiteDuJeuAvecExceptionRefactorise.EntiteAnimeeParImages(pygame.Rect((50,100),(100,100)),[5,5],"Son4.wav",9,"coq"))
+except EntiteDuJeuAvecExceptionRefactorise.CoordonneesEntiteErreur as e :
     print("Les coordonnées de l'entité dépassent la taille de la fenetre",e)
-except EntiteDuJeuAvecException.TailleExcessiveErreur as e :
+except EntiteDuJeuAvecExceptionRefactorise.TailleExcessiveErreur as e :
     print("L'entité a une taille excessive par rapport à la taille de la fenetre",e)
 except :
     print("Une exception a été levée lors de la création des entités du jeu")
