@@ -3,7 +3,7 @@
 Exemple de fonction dessiner_bot avec paramètre optionnel et valeur de défaut
 """
 
-import pygame
+import sys, pygame
 
 VERT = (0,255,0)    
 ROUGE = (255,0,0)
@@ -40,5 +40,10 @@ dessiner_bot(fenetre, pygame.Rect((250,75),(100,200)),couleur_corps = BLEU) # Sp
 dessiner_bot(fenetre, pygame.Rect((250,300),(75,150)),couleur_corps = BLEU,couleur_tete = ROUGE) # Spécifier les deux 
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
-pygame.quit() # Terminer pygame
+
+# Traiter la fermeture de la fenêtre
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
+            pygame.quit() # Terminer pygame
+            sys.exit()

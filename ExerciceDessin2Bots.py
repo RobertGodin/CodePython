@@ -3,7 +3,7 @@
 Exercice : dessin de 2 bots
 """
 # Importer la bibliothèque de pygame et initialiser 
-import pygame
+import sys, pygame
 pygame.init()
 
 LARGEUR_FENETRE = 400
@@ -34,5 +34,10 @@ pygame.draw.line(fenetre, NOIR, (50,125),(100,125), 2) # La bouche
 pygame.draw.rect(fenetre, ROUGE, ((25,150),(100,100))) # Le corps
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
-pygame.quit() # Terminer pygame
+
+# Traiter la fermeture de la fenêtre
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
+            pygame.quit() # Terminer pygame
+            sys.exit()

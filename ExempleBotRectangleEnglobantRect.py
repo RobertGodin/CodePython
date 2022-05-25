@@ -3,7 +3,7 @@
 Exemple de dessin du Bot dans un rectangle englobant
 """
 # Importer la bibliothèque de pygame et initialiser 
-import pygame
+import sys,pygame
 pygame.init()
 
 LARGEUR_FENETRE = 400
@@ -30,5 +30,10 @@ pygame.draw.line(fenetre, NOIR, (r.x+r.width/4,r.y+r.height*3/8),(r.x+r.width*3/
 pygame.draw.rect(fenetre, ROUGE, ((r.x,r.y+r.height/2),(r.width,r.height/2))) # Le corps
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
-pygame.quit() # Terminer pygame
+
+# Traiter la fermeture de la fenêtre
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
+            pygame.quit() # Terminer pygame
+            sys.exit()

@@ -3,7 +3,7 @@
 Exercice: fonction dessiner_iti
 """
 
-import pygame
+import sys, pygame
 
 def dessiner_iti(fenetre,r):
     """ Dessiner un Iti. 
@@ -43,5 +43,10 @@ dessiner_iti(fenetre,pygame.Rect((100,100),(30,60)))
 dessiner_iti(fenetre,pygame.Rect((25,50),(100,200)))
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
-pygame.quit() # Terminer pygame
+
+# Traiter la fermeture de la fenêtre
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
+            pygame.quit() # Terminer pygame
+            sys.exit()

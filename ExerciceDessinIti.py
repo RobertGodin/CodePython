@@ -3,7 +3,7 @@
 Exercice : bonhomme Iti
 """
 # Importer la bibliothèque de pygame et initialiser 
-import pygame
+import sys, pygame
 pygame.init()
 
 LARGEUR_FENETRE = 300
@@ -19,16 +19,21 @@ NOIR = (0,0,0)
 
 fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
 
-pygame.draw.ellipse(fenetre, ROSE, [133, 50, 33, 50]) # Dessiner la tête
-pygame.draw.arc(fenetre,NOIR,[140,75,19,15],3.1416,0,1) # Le sourire
-pygame.draw.ellipse(fenetre, NOIR, [138,66,8,8]) # L'oeil gauche
-pygame.draw.ellipse(fenetre, NOIR, [154,66,8,8]) # L'oeil droit
-pygame.draw.line(fenetre, NOIR, [150,100],[150,200], 2) # Le corps
-pygame.draw.line(fenetre, NOIR, [100,100],[150,150], 2) # Bras gauche
-pygame.draw.line(fenetre, NOIR, [200,100],[150,150], 2) # Bras droit
-pygame.draw.line(fenetre, NOIR, [100,250],[150,200], 2) # Jambe gauche
-pygame.draw.line(fenetre, NOIR, [200,250],[150,200], 2) # Jambe droite
+pygame.draw.ellipse(fenetre, ROSE, ((133, 50), (33, 50))) # Dessiner la tête
+pygame.draw.arc(fenetre,NOIR,((140,75),(19,15)),3.1416,0,1) # Le sourire
+pygame.draw.ellipse(fenetre, NOIR, ((138,66),(8,8))) # L'oeil gauche
+pygame.draw.ellipse(fenetre, NOIR, ((154,66),(8,8))) # L'oeil droit
+pygame.draw.line(fenetre, NOIR, (150,100),(150,200), 2) # Le corps
+pygame.draw.line(fenetre, NOIR, (100,100),(150,150), 2) # Bras gauche
+pygame.draw.line(fenetre, NOIR, (200,100),(150,150), 2) # Bras droit
+pygame.draw.line(fenetre, NOIR, (100,250),(150,200), 2) # Jambe gauche
+pygame.draw.line(fenetre, NOIR, (200,250),(150,200), 2) # Jambe droite
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
-pygame.quit() # Terminer pygame
+
+# Traiter la fermeture de la fenêtre
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
+            pygame.quit() # Terminer pygame
+            sys.exit()

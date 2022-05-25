@@ -3,7 +3,7 @@
 Exercice : bonhomme Iti
 """
 # Importer la bibliothèque de pygame et initialiser 
-import pygame
+import sys, pygame
 pygame.init()
 
 LARGEUR_FENETRE = 300
@@ -30,5 +30,10 @@ pygame.draw.line(fenetre, NOIR, (100,250),(150,200), 2) # Jambe gauche
 pygame.draw.line(fenetre, NOIR, (200,250),(150,200), 2) # Jambe droite
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
-input("Entrez fin de ligne pour terminer")
-pygame.quit() # Terminer pygame
+
+# Traiter la fermeture la fenêtre
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
+            pygame.quit() # Terminer pygame
+            sys.exit()
