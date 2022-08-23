@@ -4,6 +4,7 @@ Exemple de jeu : programme principal
 """
 import EntiteDuJeu
 import pygame
+from pygame import Color
 
 pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
@@ -12,7 +13,6 @@ fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir l
 EntiteDuJeu.EntiteAnimeeAvecSon.set_fenetre(fenetre)
 pygame.display.set_caption("Exemple de jeu avec module EntiteDuJeu")
 
-BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
 # Création de la liste des entités du jeu
@@ -40,7 +40,7 @@ while not fin :
         for une_entite in liste_entite :
             une_entite.prochaine_scene()
         
-        fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
+        fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
         for une_entite in liste_entite :
             une_entite.dessiner()
 
