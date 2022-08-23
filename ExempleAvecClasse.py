@@ -4,12 +4,7 @@ Exemple d'animation d'entités : création des classes BotAnime et ItiAnime
 """
 # Importer la librairie de pygame et initialiser 
 import pygame
-
-ROUGE = (255,0,0)
-NOIR = (0,0,0)
-VERT = (0,255,0)    
-ROSE = (255,100,100) 
-
+from pygame import Color
 class BotAnime :
     """ Un objet représente un Bot qui est animé dans une fenêtre Pygame 
     
@@ -28,11 +23,11 @@ class BotAnime :
         Le Bot est inscrit dans le rectangle englobant défini par la variable d'objet r dans une fenetre de Pygame
         """
 
-        pygame.draw.ellipse(fenetre, VERT, ((self.r.x,self.r.y),(self.r.width, self.r.height/2))) # Dessiner la tête
-        pygame.draw.rect(fenetre, NOIR, ((self.r.x+self.r.width/4,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil gauche
-        pygame.draw.rect(fenetre, NOIR, ((self.r.x+self.r.width*3/4-self.r.width/10,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil droit
-        pygame.draw.line(fenetre, NOIR, (self.r.x+self.r.width/4,self.r.y+self.r.height*3/8),(self.r.x+self.r.width*3/4,self.r.y+self.r.height*3/8), 2) # La bouche
-        pygame.draw.rect(fenetre, ROUGE, ((self.r.x,self.r.y+self.r.height/2),(self.r.width,self.r.height/2))) # Le corps
+        pygame.draw.ellipse(fenetre, Color('green'), ((self.r.x,self.r.y),(self.r.width, self.r.height/2))) # Dessiner la tête
+        pygame.draw.rect(fenetre, Color('black'), ((self.r.x+self.r.width/4,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil gauche
+        pygame.draw.rect(fenetre, Color('black'), ((self.r.x+self.r.width*3/4-self.r.width/10,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil droit
+        pygame.draw.line(fenetre, Color('black'), (self.r.x+self.r.width/4,self.r.y+self.r.height*3/8),(self.r.x+self.r.width*3/4,self.r.y+self.r.height*3/8), 2) # La bouche
+        pygame.draw.rect(fenetre, Color('red'), ((self.r.x,self.r.y+self.r.height/2),(self.r.width,self.r.height/2))) # Le corps
 
 
     def deplacer(self,largeur_fenetre,hauteur_fenetre):
@@ -64,15 +59,15 @@ class ItiAnime :
         self.milieux = self.r.x + self.r.width/2;
         self.milieuy = self.r.y + self.r.height/2;
 
-        pygame.draw.ellipse(fenetre, ROSE, ((self.r.x+self.r.width/3,self.r.y),(self.r.width/3,self.r.height/4))) # Dessiner la tête
-        pygame.draw.arc(fenetre,NOIR,((self.milieux-self.r.width/12,self.r.y+self.r.height/8),(self.r.width/6,self.r.height/14)),3.1416,0,2) # Le sourire
-        pygame.draw.ellipse(fenetre, NOIR, ((self.milieux-self.r.width/8,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil gauche
-        pygame.draw.ellipse(fenetre, NOIR, ((self.milieux+self.r.width/8-self.r.width/12,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil droit
-        pygame.draw.line(fenetre, NOIR, (self.milieux,self.r.y+self.r.height/4),(self.milieux,self.r.y+self.r.height*3/4), 2) # Le corps
-        pygame.draw.line(fenetre, NOIR, (self.r.x,self.r.y+self.r.height/4),(self.milieux,self.milieuy), 2) # Bras gauche
-        pygame.draw.line(fenetre, NOIR, (self.r.x+self.r.width,self.r.y+self.r.height/4),(self.milieux,self.milieuy), 2) # Bras droit
-        pygame.draw.line(fenetre, NOIR, (self.r.x,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe gauche
-        pygame.draw.line(fenetre, NOIR, (self.r.x+self.r.width,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe droite
+        pygame.draw.ellipse(fenetre, Color('pink'), ((self.r.x+self.r.width/3,self.r.y),(self.r.width/3,self.r.height/4))) # Dessiner la tête
+        pygame.draw.arc(fenetre, Color('black'),((self.milieux-self.r.width/12,self.r.y+self.r.height/8),(self.r.width/6,self.r.height/14)),3.1416,0,2) # Le sourire
+        pygame.draw.ellipse(fenetre, Color('black'), ((self.milieux-self.r.width/8,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil gauche
+        pygame.draw.ellipse(fenetre, Color('black'), ((self.milieux+self.r.width/8-self.r.width/12,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil droit
+        pygame.draw.line(fenetre, Color('black'), (self.milieux,self.r.y+self.r.height/4),(self.milieux,self.r.y+self.r.height*3/4), 2) # Le corps
+        pygame.draw.line(fenetre, Color('black'), (self.r.x,self.r.y+self.r.height/4),(self.milieux,self.milieuy), 2) # Bras gauche
+        pygame.draw.line(fenetre, Color('black'), (self.r.x+self.r.width,self.r.y+self.r.height/4),(self.milieux,self.milieuy), 2) # Bras droit
+        pygame.draw.line(fenetre, Color('black'), (self.r.x,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe gauche
+        pygame.draw.line(fenetre, Color('black'), (self.r.x+self.r.width,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe droite
 
 
     def deplacer(self,largeur_fenetre,hauteur_fenetre):
@@ -88,9 +83,8 @@ pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
 fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre 
-pygame.display.set_caption("Exercice des Bots et Itis en diagonale") # Définir le titre dans le haut de la fenêtre
+pygame.display.set_caption("Bot et Iti en diagonale avec classe") # Définir le titre dans le haut de la fenêtre
 
-BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
 # Création de deux BotAnime et deux ItiAnime
@@ -111,7 +105,7 @@ while not fin :
         iti1.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
         iti2.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
 
-        fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
+        fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
         bot1.dessiner(fenetre)
         bot2.dessiner(fenetre)
         iti1.dessiner(fenetre)

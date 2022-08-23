@@ -4,6 +4,7 @@ Exemple d'animation d'entités avec module Entite
 """
 import Entite
 import pygame
+from pygame import Color
 
 pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
@@ -12,7 +13,6 @@ fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir l
 Entite.EntiteAnimee.set_fenetre(fenetre)
 pygame.display.set_caption("Exemple des Bots et Itis animés en diagonale avec super-classe EntiteAnimee") # Définir le titre dans le haut de la fenêtre
 
-BLANC = (255,255,255)
 horloge = pygame.time.Clock() # Pour contrôler la fréquence des scènes
 
 # Placer deux BotAnime et deux ItiAnime dans la liste des entités
@@ -32,7 +32,7 @@ while not fin :
         for une_entite in liste_entite :
             une_entite.deplacer()
 
-        fenetre.fill(BLANC) # Dessiner le fond de la surface de dessin
+        fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
         for une_entite in liste_entite :
             une_entite.dessiner()
         pygame.display.flip() # Mettre à jour la fenêtre graphique
