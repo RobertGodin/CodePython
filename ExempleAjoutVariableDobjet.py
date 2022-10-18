@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Exercice classe Contact
+Exemple classe Contact
+Ajout d'une variable d'objet à un objet existant
 """
 
 class Contact :
@@ -19,10 +20,8 @@ class Contact :
     def __str__(self):
         return 'Le numéro de téléphone de '+self.prenom+' '+self.nom+' est :'+self.numero_telephone
     
-liste_contacts = []
-liste_contacts.append(Contact('Binette','Bob','333-333-3333'))
-liste_contacts.append(Contact('Emerson','Keith','111-111-1111'))
-liste_contacts.append(Contact('Anderson','Ian','222-222-2222'))
 
-for un_contact in liste_contacts:
-    print(un_contact)
+contact1 = Contact('Binette','Bob','333-333-3333')
+print(contact1)
+contact1.age= 52
+print(contact1)
