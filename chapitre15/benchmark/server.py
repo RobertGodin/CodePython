@@ -1,14 +1,13 @@
-import asyncio
-import websockets
-from sanic import Sanic
-from sanic.websocket import WebSocketProtocol
+# do:
+# pip install sanic
+import sanic
 
-app = Sanic(__name__)
+app = sanic.Sanic(__name__)
 
 connected = set()
 
 @app.websocket('/')
-async def chat(request, ws):
+async def sendToOthers(request, ws):
     connected.add(ws)
     try:
         while True:
@@ -20,4 +19,4 @@ async def chat(request, ws):
         connected.remove(ws)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, protocol=WebSocketProtocol)
+    app.run(host='0.0.0.0', port=8080)
