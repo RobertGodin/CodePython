@@ -1,4 +1,5 @@
-# do pip install blacksheep
+# do:
+# pip install blacksheep
 from blacksheep import Application, ws, WebSocket
 
 async def echo(websocket):
