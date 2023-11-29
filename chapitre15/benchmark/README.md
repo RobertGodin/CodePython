@@ -1,3 +1,3 @@
 ```
-pip install sanic blacksheep
+pip install sanic
 ```
