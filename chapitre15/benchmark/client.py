@@ -4,7 +4,8 @@ import websockets
 import time
 
 async def client1():
-    async with websockets.connect('ws://localhost:8080') as websocket:
+    print("client1")
+    async with websockets.connect('ws://localhost:8087/') as websocket:
         round_trips = 0
         start = time.time_ns()
         await websocket.send('allo')
@@ -15,10 +16,11 @@ async def client1():
                 end = time.time_ns()
                 duration = (end - start)/1000000000
                 print("rate: ",round_trips/duration," round trips per second")
-            await websocket.send(message)
+            await websocket.send('allo')
 
 async def client2():
-    async with websockets.connect('ws://localhost:8080') as websocket:
+    print("client2")
+    async with websockets.connect('ws://localhost:8087/') as websocket:
         while True:
             response = await websocket.recv()
             await websocket.send('allo!')
