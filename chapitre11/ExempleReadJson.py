@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Lecture du fichier Plants.json avec json.load()
 """
