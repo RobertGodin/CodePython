@@ -16,10 +16,26 @@ pre.prettyprint {
 
 </style>
 <script type="text/javascript">
+var entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;',
+  '`': '&#x60;',
+  '=': '&#x3D;'
+};
+
+function escapeHtml (string) {
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
     $(function(){
         $('#btn').on('click', function () {
             window.setTimeout(function() {
-                var data = $('#code').val();
+                var data = escapeHtml($('#code').val());
                 $('<pre>')
                     .html(prettyPrintOne(data, null, opt_numberLines=true))
                     .addClass('prettyprint prettyprinted linenums:true')
