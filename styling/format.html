@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Demo</title>
+<script src="prettify.js"></script>
+<script src="jquery-3.7.1.min.js"></script>
+<link rel="stylesheet" href="prettify.css" />
+<style type="text/css" >
+pre.prettyprint {
+    background-color: white;
+    border: 1px solid #555;
+    padding: 5px;
+}
+
+
+</style>
+<script type="text/javascript">
+    $(function(){
+        $('#btn').on('click', function () {
+            window.setTimeout(function() {
+                var data = $('#code').val();
+                $('<pre>')
+                    .html(prettyPrintOne(data, null, opt_numberLines=true))
+                    .addClass('prettyprint prettyprinted linenums:true')
+                    .css('font-family', 'Consolas,monaco,monospace')
+                    .css('font-size', '8.5pt')
+                    .prependTo('#output');
+            }, 200);
+        });
+    });
+    </script>
+</head>
+
+<body>
+    
+<textarea id="code" style="width: 100%;">
+    for i in range(10):
+        print("hello world ")
+</textarea>
+    <button id="btn">format</button>
+    <h2>Results:</h2>
+    <div id="output"></div>
+
+</body>
+</html>
