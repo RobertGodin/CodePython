@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Page d'accueil</title>
+</head>
+<body>
+    {% if users | length != 0 %}
+    <h1>Utilisateurs</h1>
+    <table>
+        <tr>
+            <th>Nom</th>
+            <th>Courriel</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <h1>Ajouter un utilisateur</h1>
+    <form action="/add" method="post">
+        <label for="name">Nom :</label>
+        <input type="text" id="name" name="name"><br><br>
+        <label for="email">Courriel :</label>
+        <input type="text" id="email" name="email"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
