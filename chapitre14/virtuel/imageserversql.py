@@ -58,7 +58,7 @@ def log(long,lat):
     if not "geo" in tables:
         con.execute("CREATE TABLE geo (date TEXT, long NUMERIC, lat NUMERIC)")
     dt = datetime.now()
-    con.execute("INSERT INTO geo (date,long,lat) values (\""+str(dt)+"\","+str(long)+", "+str(lat)+") ")
+    con.execute("INSERT INTO geo (date, long, lat) VALUES (?, ?, ?)", (str(dt), long, lat))
 
 
 app = Flask(__name__)
