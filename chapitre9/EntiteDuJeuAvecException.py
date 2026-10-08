@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 """
-Module qui contient la hiérarchie des classes EntiteAnimee : exemples d'exceptions
+Classes du jeu de casse-briques : exemples d'exceptions
 """
 import pygame
 from pygame import Color
@@ -12,22 +11,22 @@ class Erreur(Exception):
 
 class CoordonneesEntiteErreur(Erreur):
     """ Les coordonnées dépassent la fenetre d'animation
-    """    
+    """
     def __init__(self,position):
         self.position = position
 
 class TailleExcessiveErreur(Erreur):
     """ La taille de l'entité est excessive par rapport à la fenetre d'animation
-    """    
+    """
     def __init__(self, taille):
         self.taille=taille
 
 class EntiteAnimeeAvecSon :
-    """ Un objet représente une entité qui est animée dans une fenêtre Pygame. 
-    
+    """ Un objet représente une entité qui est animée dans une fenêtre Pygame.
+
     L'entité est inscrite dans le rectangle englobant r. Il se déplace en diagonale selon la vitesse v.
-    Elle émet un son lorsque supprimée.
-        r : pygame.Rect       Le rectangle englobant 
+    Elle émet un son lorsqu'elle est frappée.
+        r : pygame.Rect       Le rectangle englobant
         v : [int,int]         Vitesse de déplacement selon les deux axes x et y
         son : pygame.mixer.Sound
     """
@@ -35,7 +34,7 @@ class EntiteAnimeeAvecSon :
     @staticmethod
     def set_fenetre(fenetre):
         """ Fixer la variable de classe f qui représente la fenetre graphique
-        
+
             fenetre : pygame.Surface
         """
         EntiteAnimeeAvecSon.f = fenetre
@@ -49,80 +48,94 @@ class EntiteAnimeeAvecSon :
             self.r = rectangle
             self.v = vitesse
             self.son = pygame.mixer.Sound(fichier_son)
-        
+
     def prochaine_scene(self):
         """ Déplacer selon self.v en diagonale en rebondissant sur les bords de la fenetre"""
         if self.r.x+self.v[0] > EntiteAnimeeAvecSon.f.get_width()-self.r.width or self.r.x+self.v[0] < 0 :
-            self.v[0] = -self.v[0] # Inverser la direction en x    
+            self.v[0] = -self.v[0] # Inverser la direction en x
         self.r.x = self.r.x+self.v[0]
         if self.r.y+self.v[1] > EntiteAnimeeAvecSon.f.get_height()-self.r.height or self.r.y+self.v[1] < 0 :
-            self.v[1] = -self.v[1] # Inverser la direction en y    
-        self.r.y = self.r.y+self.v[1]        
-        
-    def touche(self,x,y):
-        return ((x >= self.r.x) and (x <= self.r.x + self.r.width) and (y >= self.r.y) and (y <= self.r.y + self.r.height))
-    
+            self.v[1] = -self.v[1] # Inverser la direction en y
+        self.r.y = self.r.y+self.v[1]
+
+    def touche(self,autre):
+        """ Vrai si les rectangles englobants se chevauchent """
+        return self.r.colliderect(autre.r)
+
     def emettre_son(self):
         self.son.play()
 
-class EntiteAvecEtat(EntiteAnimeeAvecSon):
-    def __init__(self,rectangle,vitesse,fichier_son,nombre_etats):
-        super().__init__(rectangle,vitesse,fichier_son)
-        self.nombre_etats = nombre_etats
-        self.etat_courant = 0
-    
+class Raquette(EntiteAnimeeAvecSon):
+    """ La raquette se déplace à l'horizontale selon les flèches """
     def prochaine_scene(self):
-        self.etat_courant=(self.etat_courant+1)%self.nombre_etats
-        super().prochaine_scene()
+        touches = pygame.key.get_pressed() # État du clavier
+        largeur = Raquette.f.get_width()
+        if touches[pygame.K_LEFT] :
+            self.r.x = max(0, self.r.x-self.v[0])
+        if touches[pygame.K_RIGHT] :
+            self.r.x = min(largeur-self.r.width, self.r.x+self.v[0])
 
-class BotAnime(EntiteAnimeeAvecSon) :
-    """ Un objet représente un Bot qui est animé dans une fenêtre Pygame 
-        Sous-classe de EntiteAnimee
-    """
-        
     def dessiner(self):
-        """ Dessiner un Bot. 
-    
-        Le Bot est inscrit dans le rectangle englobant défini par la variable d'objet r dans une fenetre de Pygame
-        """
+        pygame.draw.rect(Raquette.f, Color('darkblue'), self.r)
 
-        pygame.draw.ellipse(BotAnime.f, Color('green'), ((self.r.x,self.r.y),(self.r.width, self.r.height/2))) # Dessiner la tête
-        pygame.draw.rect(BotAnime.f, Color('black'), ((self.r.x+self.r.width/4,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil gauche
-        pygame.draw.rect(BotAnime.f, Color('black'), ((self.r.x+self.r.width*3/4-self.r.width/10,self.r.y+self.r.height/8),(self.r.width/10,self.r.height/20))) # L'oeil droit
-        pygame.draw.line(BotAnime.f, Color('black'), (self.r.x+self.r.width/4,self.r.y+self.r.height*3/8),(self.r.x+self.r.width*3/4,self.r.y+self.r.height*3/8), 2) # La bouche
-        pygame.draw.rect(BotAnime.f, Color('red'), ((self.r.x,self.r.y+self.r.height/2),(self.r.width,self.r.height/2))) # Le corps
-        
-    
-class ItiAnimeVolant(EntiteAvecEtat) :
-    """ Un objet représente un Iti qui est animé dans une fenêtre Pygame 
-        Sous-classe de EntiteAnimee    
-    """
-    
+class Balle(EntiteAnimeeAvecSon):
+    """ La balle rebondit sur les bords, sauf sur le bord du bas """
+    def prochaine_scene(self):
+        if self.r.bottom+self.v[1] > Balle.f.get_height() :
+            self.r.y = self.r.y+self.v[1] # La balle sort par le bas
+        else :
+            super().prochaine_scene()
+
+    def perdue(self):
+        """ Vrai si la balle est complètement sortie par le bas """
+        return self.r.y > Balle.f.get_height()
+
+    def rebondir_sur(self,autre):
+        """ Rebondir sur l'entité autre. Si la zone de chevauchement
+        est plus large que haute, la balle a frappé le dessus ou le
+        dessous de l'entité ; sinon, elle a frappé un côté.
+        """
+        chevauchement = self.r.clip(autre.r)
+        if chevauchement.width >= chevauchement.height :
+            self.v[1] = -self.v[1]
+        else :
+            self.v[0] = -self.v[0]
+
+    def rebondir_sur_raquette(self,raquette):
+        """ L'angle du rebond dépend de l'endroit frappé """
+        self.v[1] = -abs(self.v[1])
+        self.v[0] = (self.r.centerx-raquette.r.centerx)//8
+
     def dessiner(self):
-        """ Dessiner un Iti. 
-    
-        Le Iti est inscrit dans le rectangle englobant défini par la variable d'objet r dans une fenetre de Pygame
-        L'etat courant détermine la hauteur des bras.
-        """
-        self.milieux = self.r.x + self.r.width/2;
-        self.milieuy = self.r.y + self.r.height/2;
+        pygame.draw.ellipse(Balle.f, Color('black'), self.r)
 
-        pygame.draw.ellipse(ItiAnimeVolant.f, Color('pink'), ((self.r.x+self.r.width/3,self.r.y),(self.r.width/3,self.r.height/4))) # Dessiner la tête
-        pygame.draw.arc(ItiAnimeVolant.f,Color('black'),((self.milieux-self.r.width/12,self.r.y+self.r.height/8),(self.r.width/6,self.r.height/14)),3.1416,0,2) # Le sourire
-        pygame.draw.ellipse(ItiAnimeVolant.f, Color('black'), ((self.milieux-self.r.width/8,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil gauche
-        pygame.draw.ellipse(ItiAnimeVolant.f, Color('black'), ((self.milieux+self.r.width/8-self.r.width/12,self.r.y+self.r.height/12),(self.r.width/12,self.r.height/24))) # L'oeil droit
-        pygame.draw.line(ItiAnimeVolant.f, Color('black'), (self.milieux,self.r.y+self.r.height/4),(self.milieux,self.r.y+self.r.height*3/4), 2) # Le corps
-        pygame.draw.line(ItiAnimeVolant.f, Color('black'), (self.r.x,self.r.y+self.r.height/4+(self.r.height/4)*self.etat_courant),(self.milieux,self.milieuy), 2) # Bras gauche
-        pygame.draw.line(ItiAnimeVolant.f, Color('black'), (self.r.x+self.r.width,self.r.y+self.r.height/4+(self.r.height/4)*self.etat_courant),(self.milieux,self.milieuy), 2) # Bras droit
-        pygame.draw.line(ItiAnimeVolant.f, Color('black'), (self.r.x,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe gauche
-        pygame.draw.line(ItiAnimeVolant.f, Color('black'), (self.r.x+self.r.width,self.r.y+self.r.height),(self.milieux,self.r.y+self.r.height*3/4), 2) # Jambe droite
+class Brique(EntiteAnimeeAvecSon):
+    """ Une brique immobile qui est détruite au premier coup """
+    def __init__(self,rectangle,fichier_son,couleur):
+        super().__init__(rectangle,[0,0],fichier_son)
+        self.couleur = couleur
 
+    def frapper(self):
+        """ Retourne vrai si la brique doit être détruite """
+        self.emettre_son()
+        return True
 
-class EntiteAnimeeParImages(EntiteAvecEtat):
-        def __init__(self,rectangle,vitesse,fichier_son,nombre_etats,nom_dossier):
-            super().__init__(rectangle,vitesse,fichier_son,nombre_etats)
-            self.image_animation = []
-            for i in range(nombre_etats):
-                self.image_animation.append(pygame.transform.scale(pygame.image.load(nom_dossier+"/"+nom_dossier+str(i+1)+".gif"),(self.r.width,self.r.height)))
-        def dessiner(self):
-            EntiteAnimeeParImages.f.blit(self.image_animation[self.etat_courant],[self.r.x,self.r.y])
+    def dessiner(self):
+        pygame.draw.rect(Brique.f, self.couleur, self.r)
+
+class BriqueResistante(Brique):
+    """ Une brique qui doit être frappée plusieurs fois """
+    def __init__(self,rectangle,fichier_son,couleur,nombre_coups):
+        super().__init__(rectangle,fichier_son,couleur)
+        self.coups_restants = nombre_coups
+
+    def frapper(self):
+        super().frapper()
+        self.coups_restants = self.coups_restants-1
+        return self.coups_restants == 0
+
+    def dessiner(self):
+        super().dessiner()
+        # Bordure dont l'épaisseur indique les coups restants
+        pygame.draw.rect(BriqueResistante.f, Color('black'), self.r,
+                         self.coups_restants)

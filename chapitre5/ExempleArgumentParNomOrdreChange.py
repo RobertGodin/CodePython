@@ -1,39 +1,35 @@
-# -*- coding: utf-8 -*-
 """
-Exemple de fonction dessiner_bot avec paramètre optionnel et valeur de défaut
+Exemple d'arguments passés par nom dans un ordre différent
 """
 
 import sys, pygame
 from pygame import Color
 
-def dessiner_bot(fenetre,r,couleur_tete = Color('green'),couleur_corps = Color('red')):
-    """ Dessiner un Bot. 
-    
+def dessiner_raquette(fenetre,r,couleur_embouts = Color('red'),couleur_corps = Color('gray')):
+    """ Dessiner une raquette.
+
     fenetre : la surface de dessin
     r : rectangle englobant de type pygame.Rect
     """
 
-    # Dessiner le Bot relativement au rectangle englobant r
-    pygame.draw.ellipse(fenetre, couleur_tete, ((r.x,r.y),(r.width, r.height/2))) # Dessiner la tête
-    pygame.draw.rect(fenetre, Color('black'), ((r.x+r.width/4,r.y+r.height/8),(r.width/10,r.height/20))) # L'oeil gauche
-    pygame.draw.rect(fenetre, Color('black'), ((r.x+r.width*3/4-r.width/10,r.y+r.height/8),(r.width/10,r.height/20))) # L'oeil droit
-    pygame.draw.line(fenetre, Color('black'), (r.x+r.width/4,r.y+r.height*3/8),(r.x+r.width*3/4,r.y+r.height*3/8), 2) # La bouche
-    pygame.draw.rect(fenetre, couleur_corps, ((r.x,r.y+r.height/2),(r.width,r.height/2))) # Le corps
-    
+    # Dessiner la raquette relativement au rectangle englobant r
+    pygame.draw.ellipse(fenetre, couleur_embouts, ((r.x,r.y),(r.width/3,r.height))) # L'embout gauche
+    pygame.draw.ellipse(fenetre, couleur_embouts, ((r.x+r.width*2/3,r.y),(r.width/3,r.height))) # L'embout droit
+    pygame.draw.rect(fenetre, couleur_corps, ((r.x+r.width/6,r.y),(r.width*2/3,r.height))) # Le corps
+    pygame.draw.rect(fenetre, Color('yellow'), ((r.x+r.width/4,r.y+r.height/4),(r.width/10,r.height/5))) # Le voyant gauche
+    pygame.draw.rect(fenetre, Color('yellow'), ((r.x+r.width*3/4-r.width/10,r.y+r.height/4),(r.width/10,r.height/5))) # Le voyant droit
+    pygame.draw.line(fenetre, Color('black'), (r.x+r.width/4,r.y+r.height*3/4),(r.x+r.width*3/4,r.y+r.height*3/4), 2) # La bande
+
 pygame.init() # Initialiser Pygame
 LARGEUR_FENETRE = 400
 HAUTEUR_FENETRE = 600
-fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre  
-pygame.display.set_caption('Exemple de dessin du Bot dans un rectangle englobant') # Définir le titre dans le haut de la fenêtre
+fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre
+pygame.display.set_caption('Exemple de dessin de la raquette dans un rectangle englobant') # Définir le titre dans le haut de la fenêtre
 
 fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
 
 # Variantes d'appel de fonction avec paramètres optionnels
-dessiner_bot(r=pygame.Rect((25,50),(100,200)),fenetre=fenetre) # Employer valeurs de défaut
-
-dessiner_bot(fenetre,pygame.Rect((25,350),(75,150)),couleur_tete = Color('blue')) # Spécifier une couleur pour la tete
-dessiner_bot(fenetre, pygame.Rect((250,75),(100,200)),couleur_corps = Color('blue')) # Spécifier une couleur pour le corps
-dessiner_bot(fenetre, pygame.Rect((250,300),(75,150)),couleur_corps = Color('blue'),couleur_tete = Color('red')) # Spécifier les deux 
+dessiner_raquette(r=pygame.Rect((20,50),(160,40)),fenetre=fenetre) # Employer valeurs par défaut
 
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 
