@@ -13,13 +13,13 @@ class EntiteAnimee :
         v : [int,int]         Vitesse de déplacement selon les deux axes x et y
     """
 
-    @staticmethod
-    def set_fenetre(fenetre):
+    @classmethod
+    def set_fenetre(cls, fenetre):
         """ Fixer la variable de classe f qui représente la fenetre graphique
 
             fenetre : pygame.Surface
         """
-        EntiteAnimee.f = fenetre
+        cls.f = fenetre
 
     def __init__(self,rectangle,vitesse):
         self.r = rectangle
@@ -29,10 +29,10 @@ class EntiteAnimee :
         """ Déplacer selon self.v en diagonale en rebondissant sur les bords de la fenetre"""
         if self.r.x+self.v[0] > EntiteAnimee.f.get_width()-self.r.width or self.r.x+self.v[0] < 0 :
             self.v[0] = -self.v[0] # Inverser la direction en x
-        self.r.x = self.r.x+self.v[0]
+        self.r.x += self.v[0]
         if self.r.y+self.v[1] > EntiteAnimee.f.get_height()-self.r.height or self.r.y+self.v[1] < 0 :
             self.v[1] = -self.v[1] # Inverser la direction en y
-        self.r.y = self.r.y+self.v[1]
+        self.r.y += self.v[1]
 
 class RaquetteAnimee(EntiteAnimee) :
     """ Un objet représente une raquette qui est animée dans une fenêtre Pygame
@@ -54,7 +54,7 @@ class RaquetteAnimee(EntiteAnimee) :
 
 
 class BalleAnimee(EntiteAnimee) :
-    """ Un objet représente une raquette qui est animée dans une fenêtre Pygame
+    """ Un objet représente une balle qui est animée dans une fenêtre Pygame
         Sous-classe de EntiteAnimee
     """
 

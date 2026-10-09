@@ -32,23 +32,22 @@ TAILLE_BALLE = (50,50)
 # Boucle d'animation : La balle se déplace en diagonale
 fin = False
 while not fin :
-    event = pygame.event.poll() # Chercher le prochain évènement à traiter
-    if event.type == pygame.QUIT:  # Utilisateur a cliqué sur la fermeture de fenêtre ?
-        fin = True  # Fin de la boucle du jeu
-    else :
-        # Déplacer la balle : Inverser la direction si le bord est atteint
-        if x_balle+vitesse_deplacement_x > LARGEUR_FENETRE-TAILLE_BALLE[0] or x_balle+vitesse_deplacement_x < 0 :
-            vitesse_deplacement_x = -vitesse_deplacement_x # Inverser la direction en x
-        x_balle = x_balle+vitesse_deplacement_x
-        if y_balle+vitesse_deplacement_y > HAUTEUR_FENETRE-TAILLE_BALLE[1] or y_balle+vitesse_deplacement_y < 0 :
-            vitesse_deplacement_y = -vitesse_deplacement_y # Inverser la direction en y
-        y_balle = y_balle+vitesse_deplacement_y
+    for event in pygame.event.get(): # Traiter tous les évènements
+        if event.type == pygame.QUIT: # Fermeture de la fenêtre ?
+            fin = True  # Fin de la boucle du jeu
+    # Déplacer la balle : Inverser la direction si le bord est atteint
+    if x_balle+vitesse_deplacement_x > LARGEUR_FENETRE-TAILLE_BALLE[0] or x_balle+vitesse_deplacement_x < 0 :
+        vitesse_deplacement_x = -vitesse_deplacement_x # Inverser la direction en x
+    x_balle += vitesse_deplacement_x
+    if y_balle+vitesse_deplacement_y > HAUTEUR_FENETRE-TAILLE_BALLE[1] or y_balle+vitesse_deplacement_y < 0 :
+        vitesse_deplacement_y = -vitesse_deplacement_y # Inverser la direction en y
+    y_balle += vitesse_deplacement_y
 
-        fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
-        dessiner_balle(fenetre,pygame.Rect((x_balle,y_balle),TAILLE_BALLE)) # Dessiner la balle
-        pygame.display.flip() # Mettre à jour la fenêtre graphique
+    fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
+    dessiner_balle(fenetre,pygame.Rect((x_balle,y_balle),TAILLE_BALLE)) # Dessiner la balle
+    pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 
-        horloge.tick(60) # Pour animer avec 60 images par seconde
+    horloge.tick(60) # Pour animer avec 60 images par seconde
 
 pygame.quit() # Terminer pygame

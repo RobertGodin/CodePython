@@ -1,5 +1,18 @@
+# Importer le module datetime
+from datetime import datetime
+
+# Importer le module locale
+import locale
+
 # Importer le module flask
 from flask import Flask
+
+# Définir le paramètre régional une seule fois, au démarrage
+try:
+    locale.setlocale(locale.LC_TIME, "fr_CA.UTF-8")
+except locale.Error:
+    # Paramètre régional non installé : on garde celui par défaut
+    pass
 
 # Créer une instance de l'application Flask
 app = Flask(__name__)
@@ -7,19 +20,10 @@ app = Flask(__name__)
 # Définir la route principale
 @app.route("/")
 def index():
-    # Importer le module datetime
-    from datetime import datetime
-
-    # Importer le module locale, qui permet de gérer les paramètres régionaux
-    import locale
-
-    # Définir le paramètre régional à "fr_CA" pour le français du Canada
-    locale.setlocale(locale.LC_TIME, "fr_CA")
-
     # Obtenir la date et l'heure
     now = datetime.now()
 
-    # Formater la date et l'heure en français avec la méthode strftime
+    # Formater la date et l'heure
     date = now.strftime("%A %d %B %Y")
     heure = now.strftime("%H:%M:%S")
 

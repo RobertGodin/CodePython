@@ -2,7 +2,7 @@
 Exercice: fonction dessiner_balle
 """
 
-import sys, pygame
+import pygame
 from pygame import Color
 
 def dessiner_balle(fenetre,r):
@@ -33,8 +33,9 @@ dessiner_balle(fenetre,pygame.Rect((25,50),(100,100)))
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 # Traiter la fermeture de la fenêtre
-while True:
+en_cours = True
+while en_cours:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
-            pygame.quit() # Terminer pygame
-            sys.exit()
+        if event.type == pygame.QUIT: # Clic sur la fermeture de fenêtre ?
+            en_cours = False
+pygame.quit() # Terminer pygame

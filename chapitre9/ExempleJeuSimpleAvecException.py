@@ -37,10 +37,10 @@ try :
                     rectangle,"Son2.wav",couleurs[rangee])
             liste_briques.append(brique)
 except EntiteDuJeuAvecException.CoordonneesEntiteErreur as e :
-    print("Les coordonnées de l'entité dépassent la taille de la fenetre",e)
+    print(f"Position invalide : {e}")
 except EntiteDuJeuAvecException.TailleExcessiveErreur as e :
-    print("L'entité a une taille excessive par rapport à la taille de la fenetre",e)
-except :
+    print(f"Taille invalide : {e}")
+except Exception :
     print("Une exception a été levée lors de la création des entités du jeu")
     raise
 else :
@@ -51,9 +51,9 @@ else :
     # Boucle d'animation
     fin = False
     while not fin :
-        event = pygame.event.poll() # Chercher le prochain évènement
-        if event.type == pygame.QUIT: # Fermeture de la fenêtre ?
-            fin = True # Fin de la boucle du jeu
+        for event in pygame.event.get(): # Tous les évènements
+            if event.type == pygame.QUIT: # Fermeture de la fenêtre ?
+                fin = True # Fin de la boucle du jeu
         if message == "" : # La partie est en cours
             raquette.prochaine_scene()
             balle.prochaine_scene()
@@ -81,7 +81,7 @@ else :
             une_brique.dessiner()
         raquette.dessiner()
         balle.dessiner()
-        texte = "Score : "+str(score)+"   Vies : "+str(vies)
+        texte = f"Score : {score}   Vies : {vies}"
         image_texte = police.render(texte, True, Color('black'))
         fenetre.blit(image_texte, (10,570))
         if message != "" :

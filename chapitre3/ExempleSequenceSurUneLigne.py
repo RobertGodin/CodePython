@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*-
-'''
-Ce programme illustre le cas d'une séquence sur une ligne '''
-
 # Saisir les deux chaînes de caractères qui représentent des nombres entiers
 chaine1 = input("Entrez un premier nombre entier :")
 chaine2 = input("Entrez un second nombre entier :")
 
-# Convertir les deux chaînes de caractères en entiers et calculer la somme
-entier1 = int(chaine1); entier2 = int(chaine2); somme = entier1 + entier2
-
-# Afficher la somme 
-print("La somme des deux entiers est ",somme)
+# Convertir les deux chaînes de caractères en entiers
+entier1 = int(chaine1); entier2 = int(chaine2)
+somme = entier1 + entier2
+# Afficher la somme
+print(f"La somme des deux entiers est {somme}")

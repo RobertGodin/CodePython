@@ -2,7 +2,7 @@
 Exemple de dessin 2D avec pygame
 """
 # Importer la librairie de pygame et initialiser
-import sys, pygame
+import pygame
 pygame.init()
 
 LARGEUR_FENETRE = 400
@@ -30,8 +30,9 @@ pygame.draw.line(fenetre, NOIR, (125,325),(275,325),2) # La bande
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 # Traiter la fermeture de la fenêtre
-while True:
+en_cours = True
+while en_cours:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
-            pygame.quit() # Terminer pygame
-            sys.exit()
+        if event.type == pygame.QUIT: # Clic sur la fermeture de fenêtre ?
+            en_cours = False
+pygame.quit() # Terminer pygame

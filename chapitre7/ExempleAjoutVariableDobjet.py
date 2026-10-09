@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Exemple classe Contact
 Ajout d'une variable d'objet à un objet existant
 """
-
 class Contact :
-    """ Un objet représente un contact 
+    """ Un objet représente un contact
 
         nom : str
         prenom : str
@@ -16,12 +14,13 @@ class Contact :
         self.nom = nom
         self.prenom = prenom
         self.numero_telephone = numero_telephone
-        
+
     def __str__(self):
-        return 'Le numéro de téléphone de '+self.prenom+' '+self.nom+' est :'+self.numero_telephone
-    
+        return (f"Le numéro de téléphone de {self.prenom} {self.nom}"
+                f" est : {self.numero_telephone}")
 
 contact1 = Contact('Binette','Bob','333-333-3333')
 print(contact1)
-contact1.age= 52
+contact1.age = 52
 print(contact1)
+

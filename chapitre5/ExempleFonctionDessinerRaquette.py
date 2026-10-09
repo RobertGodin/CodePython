@@ -2,7 +2,7 @@
 Exemple de fonction dessiner_raquette
 """
 
-import sys,pygame
+import pygame
 from pygame import Color
 
 def dessiner_raquette(fenetre,r):
@@ -26,7 +26,6 @@ HAUTEUR_FENETRE = 600
 fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE)) # Ouvrir la fenêtre
 pygame.display.set_caption('Exemple de dessin de la raquette dans un rectangle englobant') # Définir le titre dans le haut de la fenêtre
 
-BLANC = (255,255,255)
 fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
 
 # Dessiner deux raquettes en appelant la fonction à deux reprises
@@ -36,8 +35,9 @@ dessiner_raquette(fenetre,pygame.Rect((20,50),(120,40)))
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 # Traiter la fermeture de la fenêtre
-while True:
+en_cours = True
+while en_cours:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
-            pygame.quit() # Terminer pygame
-            sys.exit()
+        if event.type == pygame.QUIT: # Clic sur la fermeture de fenêtre ?
+            en_cours = False
+pygame.quit() # Terminer pygame

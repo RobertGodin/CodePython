@@ -1,147 +1,153 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <script>
-            let socket = new WebSocket("ws://"+window.location.host+"/ws");
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Grille collaborative</title>
+    <script type="module">
+      // wss:// si la page est servie en HTTPS, sinon ws://
+      const socket = new WebSocket(
+        (location.protocol === "https:" ? "wss://" : "ws://") +
+        location.host + "/ws");
 
-            function getstatus() {
-                let boxes = document.querySelectorAll(".box");
-                let data = Array.from(boxes, function (box) {
-                    return box.style.background[0];
-                }).toString();
-                return data;
-            }
+      function getstatus() {
+        const boxes = document.querySelectorAll(".box");
+        const data = Array.from(boxes, function (box) {
+          return box.classList.contains("bleu") ? "b" : "w";
+        }).toString();
+        return data;
+      }
 
-            socket.addEventListener("open", (event) => {
-                document.getElementById("message").innerHTML = "👌";
-                let boxes = document.querySelectorAll(".box");
-                
-                Array.from(boxes, function (box) {
-                    box.addEventListener("click", function (event) {
-                        if (event.target.style.background == "blue") event.target.style.background = "white";
-                        else event.target.style.background = "blue";
-                        let data = getstatus();
-                        socket.send(data);
-                        document.getElementById("message").innerHTML = "✉️";
-                        
-                    });                    
-                });
-            });
+      socket.addEventListener("open", (event) => {
+        document.getElementById("message").innerHTML = "ok";
+        const boxes = document.querySelectorAll(".box");
 
-            socket.addEventListener("message", (event) => {
-                document.getElementById("message").innerHTML = "📨";
-                let boxes = document.querySelectorAll(".box");
-                let data = event.data.split(",");
-                Array.from(boxes, function (box, index) {
-                    if (data[index] == "b") box.style.background = "blue";
-                    else box.style.background = "white";
-                });
-            });
+        Array.from(boxes, function (box) {
+          box.addEventListener("click", function (event) {
+            event.target.classList.toggle("bleu");
+            const data = getstatus();
+            socket.send(data);
+            document.getElementById("message").innerHTML = "transmis";
+          });
+        });
+      });
 
-            socket.addEventListener("error", (event) => {
-                document.getElementById("message").innerHTML = "💣 " + event.data;
-            });
+      socket.addEventListener("message", (event) => {
+        document.getElementById("message").innerHTML = "reçu";
+        const boxes = document.querySelectorAll(".box");
+        const data = event.data.split(",");
+        Array.from(boxes, function (box, index) {
+          box.classList.toggle("bleu", data[index] === "b");
+        });
+      });
 
-            socket.addEventListener("close", (event) => {
-                document.getElementById("message").innerHTML = "🚪 " + event.data;
-            });
+      socket.addEventListener("error", (event) => {
+        document.getElementById("message").innerHTML = "erreur";
+      });
 
-        </script>
-        <style>
-            body {
-                background: #d3d3d3;
-            }
-            #message {
-                margin-left: auto;
-                margin-right: auto;
-                width: 30vw;
-                padding: 2em;
-            }
+      socket.addEventListener("close", (event) => {
+        document.getElementById("message").innerHTML =
+          "fermé (code " + event.code + ")";
+      });
+    </script>
+    <style>
+      body {
+        background: #d3d3d3;
+      }
+      #message {
+        margin-left: auto;
+        margin-right: auto;
+        width: 30vw;
+        padding: 2em;
+      }
 
-            .wrapper {
-                margin-left: auto;
-                margin-right: auto;
-                display: flex;
-                width: 30vw;
-                height: 30vw;
-                gap: 1px;
-                flex-wrap: wrap;
-            }
+      .wrapper {
+        margin-left: auto;
+        margin-right: auto;
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        width: 30vw;
+        height: 30vw;
+        gap: 1px;
+      }
 
-            .box {
-                flex-grow: 1;
-                width: 12.5%;
-                border: 1px solid black;
-                background-color: white;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="wrapper">
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-            <div class="box"></div>
-        </div>
-        <div id="message"></div>
-    </body>
+      .box {
+        border: 1px solid black;
+        background-color: white;
+      }
+
+      .box.bleu {
+        background-color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+    </div>
+    <div id="message"></div>
+  </body>
 </html>

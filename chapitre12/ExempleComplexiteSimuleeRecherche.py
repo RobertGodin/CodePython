@@ -141,9 +141,9 @@ def recherche_binaire_recursive(element,liste_triee, borne_inferieure, borne_sup
         if liste_triee[milieu] == element:
             return True
         elif liste_triee[milieu] > element:
-            return recherche_binaire_recursive(liste_triee, borne_inferieure, milieu - 1, element)
+            return recherche_binaire_recursive(element, liste_triee, borne_inferieure, milieu - 1)
         else:
-            return recherche_binaire_recursive(liste_triee, milieu + 1, borne_superieure, element)
+            return recherche_binaire_recursive(element, liste_triee, milieu + 1, borne_superieure)
     else:
         # L'élément est absent
         return False
@@ -152,7 +152,7 @@ liste = [ 7,5,10,1,25,8,20 ]
 liste.sort()
 element = 8
 print("------------- Recherche binaire récursive de ",element," dans liste triée", liste)
-if recherche_binaire_recursive(element, liste,0,len(liste)):
+if recherche_binaire_recursive(element, liste, 0, len(liste) - 1):
     print("Element présent")
 else:
     print("Element absent")
@@ -172,11 +172,11 @@ def recherche_binaire_recursive_indice(element,liste_triee,borne_inferieure, bor
         # If element is smaller than milieu, then it can only
         # be present in left subliste_trieeay
         elif liste_triee[milieu] > element:
-            return recherche_binaire_recursive(element,liste_triee, borne_inferieure, milieu - 1)
+            return recherche_binaire_recursive_indice(element, liste_triee, borne_inferieure, milieu - 1)
  
         # Else the element can only be present in right subliste_trieeay
         else:
-            return recherche_binaire_recursive(element,liste_triee, milieu + 1, borne_superieure, element)
+            return recherche_binaire_recursive_indice(element, liste_triee, milieu + 1, borne_superieure)
  
     else:
         # Element is not present in the liste_trieeay

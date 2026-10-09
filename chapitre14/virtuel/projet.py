@@ -1,3 +1,5 @@
+import json
+
 import simdjson
 from roaringbitmap import RoaringBitmap
 
@@ -9,10 +11,10 @@ rb.add(1)
 rb.add(2)
 rb.add(3)
 
-# Convertir l'objet RoaringBitmap en JSON
-json_data = str([i for i in rb])
+# Convertir le contenu de l'objet RoaringBitmap en JSON
+json_data = json.dumps(list(rb))
 
-# Analyser le JSON avec pysimdjson
+# Analyser le JSON avec simdjson (paquet pysimdjson)
 data = simdjson.loads(json_data)
 
 # Afficher les éléments de l'objet RoaringBitmap

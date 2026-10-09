@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Lecture du fichier Plants.csv en format csv, création d'une liste d'objets de la classe Plant
 Ecriture des données de liste_plants dans Plants.json avec json.dump()
 """
 
 import csv
-import struct
 import json
 
 # Classe Plant
@@ -15,16 +13,18 @@ class Plant:
         self.description = description
         self.prix = prix
     def __str__(self):
-        return '|{:>10}|{:>20}|{:8.2f}|'.format(self.numero,self.description,self.prix)
+        return (f"|{self.numero:>10}|{self.description:>20}"
+                f"|{self.prix:8.2f}|")
 
 liste_plants = []
 
-with open('Plants.csv', mode='r') as fichier_csv:
+with open('Plants.csv', newline='', encoding='utf-8') as fichier_csv:
     lecteur_csv = csv.reader(fichier_csv)
     for ligne in lecteur_csv:
-        un_plant = Plant(ligne[0],ligne[1],ligne[2])
-#        print(un_plant)
-        liste_plants.append(ligne)
+        un_plant = Plant(int(ligne[0]),ligne[1],float(ligne[2]))
+        liste_plants.append(un_plant)
 
-with open('Plants.json', mode = 'w') as fichier_json:
-    json.dump(liste_plants, fichier_json)
+# JSON ne connaît pas la classe Plant : on écrit un dictionnaire par plant
+donnees = [vars(un_plant) for un_plant in liste_plants]
+with open('Plants.json', mode='w', encoding='utf-8') as fichier_json:
+    json.dump(donnees, fichier_json, ensure_ascii=False, indent=2)

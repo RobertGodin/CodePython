@@ -13,13 +13,15 @@ class CoordonneesEntiteErreur(Erreur):
     """ Les coordonnées dépassent la fenetre d'animation
     """
     def __init__(self,position):
+        super().__init__(f"coordonnées {position} hors de la fenêtre")
         self.position = position
 
 class TailleExcessiveErreur(Erreur):
     """ La taille de l'entité est excessive par rapport à la fenetre d'animation
     """
     def __init__(self, taille):
-        self.taille=taille
+        super().__init__(f"taille {taille} trop grande pour la fenêtre")
+        self.taille = taille
 
 class EntiteAnimeeAvecSon :
     """ Un objet représente une entité qui est animée dans une fenêtre Pygame.
@@ -31,13 +33,13 @@ class EntiteAnimeeAvecSon :
         son : pygame.mixer.Sound
     """
 
-    @staticmethod
-    def set_fenetre(fenetre):
+    @classmethod
+    def set_fenetre(cls, fenetre):
         """ Fixer la variable de classe f qui représente la fenetre graphique
 
             fenetre : pygame.Surface
         """
-        EntiteAnimeeAvecSon.f = fenetre
+        cls.f = fenetre
 
     def __init__(self,rectangle,vitesse,fichier_son):
         if rectangle.x < 0 or rectangle.y < 0 or rectangle.x > EntiteAnimeeAvecSon.f.get_width() or rectangle.y > EntiteAnimeeAvecSon.f.get_height() :
@@ -106,7 +108,7 @@ class Balle(EntiteAnimeeAvecSon):
     def rebondir_sur_raquette(self,raquette):
         """ L'angle du rebond dépend de l'endroit frappé """
         self.v[1] = -abs(self.v[1])
-        self.v[0] = (self.r.centerx-raquette.r.centerx)//8
+        self.v[0] = round((self.r.centerx-raquette.r.centerx)/8)
 
     def dessiner(self):
         pygame.draw.ellipse(Balle.f, Color('black'), self.r)

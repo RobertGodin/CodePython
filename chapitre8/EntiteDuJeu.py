@@ -15,13 +15,13 @@ class EntiteAnimeeAvecSon :
         son : pygame.mixer.Sound
     """
 
-    @staticmethod
-    def set_fenetre(fenetre):
+    @classmethod
+    def set_fenetre(cls, fenetre):
         """ Fixer la variable de classe f qui représente la fenetre graphique
 
             fenetre : pygame.Surface
         """
-        EntiteAnimeeAvecSon.f = fenetre
+        cls.f = fenetre
 
     def __init__(self,rectangle,vitesse,fichier_son):
         self.r = rectangle
@@ -83,7 +83,7 @@ class Balle(EntiteAnimeeAvecSon):
     def rebondir_sur_raquette(self,raquette):
         """ L'angle du rebond dépend de l'endroit frappé """
         self.v[1] = -abs(self.v[1])
-        self.v[0] = (self.r.centerx-raquette.r.centerx)//8
+        self.v[0] = round((self.r.centerx-raquette.r.centerx)/8)
 
     def dessiner(self):
         pygame.draw.ellipse(Balle.f, Color('black'), self.r)

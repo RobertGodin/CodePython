@@ -1,5 +1,7 @@
-from flask import Flask, render_template, request, redirect
 import sqlite3
+from contextlib import closing
+
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
@@ -19,15 +21,18 @@ def ajoute():
 
     conn = sqlite3.connect('exemple.db')
     c = conn.cursor()
-    c.execute('INSERT INTO users (name, email) VALUES (?, ?)', (name, email))
+    c.execute('INSERT INTO users (name, email) VALUES (?, ?)',
+              (name, email))
     conn.commit()
     conn.close()
     return redirect('/')
 
-with sqlite3.connect('exemple.db') as conn:
+with closing(sqlite3.connect('exemple.db')) as conn:
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS users
                         (id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT NOT NULL,
                         email TEXT NOT NULL);''')
-app.run()
+
+if __name__ == '__main__':
+    app.run()

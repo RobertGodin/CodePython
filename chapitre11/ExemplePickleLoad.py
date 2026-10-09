@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
 """
 Lecture du fichier Plants.pickle avec pickle.load()
 """
 
-import csv
-import struct
 import pickle
 
 # Classe Plant
@@ -14,9 +11,10 @@ class Plant:
         self.description = description
         self.prix = prix
     def __str__(self):
-        return '|{:>10}|{:>20}|{:8.2f}|'.format(self.numero,self.description,self.prix)
+        return (f"|{self.numero:>10}|{self.description:>20}"
+                f"|{self.prix:8.2f}|")
 
-with open('Plants.pickle', mode = 'rb') as fichier_binaire: 
+with open('Plants.pickle', mode = 'rb') as fichier_binaire:
     liste_plants = pickle.load(fichier_binaire)
 
 for un_plant in liste_plants:

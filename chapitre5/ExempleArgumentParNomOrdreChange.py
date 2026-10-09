@@ -2,7 +2,7 @@
 Exemple d'arguments passés par nom dans un ordre différent
 """
 
-import sys, pygame
+import pygame
 from pygame import Color
 
 def dessiner_raquette(fenetre,r,couleur_embouts = Color('red'),couleur_corps = Color('gray')):
@@ -34,9 +34,10 @@ dessiner_raquette(r=pygame.Rect((20,50),(160,40)),fenetre=fenetre) # Employer va
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 # Traiter la fermeture de la fenêtre
-while True:
+en_cours = True
+while en_cours:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
-            pygame.quit() # Terminer pygame
-            sys.exit()
+        if event.type == pygame.QUIT: # Clic sur la fermeture de fenêtre ?
+            en_cours = False
+pygame.quit() # Terminer pygame
 

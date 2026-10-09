@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """
 Exemple du write() fichier texte
 """
-fichier = open("FichierWrite.txt", "w")
-fichier.write("abc\n12\n")
-fichier.close()
+with open("FichierWrite.txt", "w", encoding="utf-8") as fichier:
+    fichier.write("abc\n12\n")

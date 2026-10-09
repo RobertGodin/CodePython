@@ -32,7 +32,9 @@ VITESSE_DEPLACEMENT = 5 # En pixels par scène
 TAILLE_RAQUETTE = (100,25)
 # Boucle d'animation par une suite de scènes
 # La raquette avance de la bordure gauche jusqu'à la droite
-for position_horizontale in range(0,LARGEUR_FENETRE-TAILLE_RAQUETTE[0],VITESSE_DEPLACEMENT) :
+for position_horizontale in range(0,LARGEUR_FENETRE-TAILLE_RAQUETTE[0]+1,
+                                  VITESSE_DEPLACEMENT) :
+    pygame.event.pump() # Laisser le système traiter les évènements
     fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
     dessiner_raquette(fenetre,pygame.Rect((position_horizontale,position_verticale),TAILLE_RAQUETTE))
     pygame.display.flip() # Mettre à jour la fenêtre graphique

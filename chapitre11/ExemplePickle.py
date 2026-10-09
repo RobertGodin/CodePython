@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Lecture du fichier Plants.csv en format csv, création d'une liste d'objets de la classe Plant
 Ecriture de l'objet liste_plants dans Plants.pickle avec le module pickle
 """
 
 import csv
-import struct
 import pickle
 
 # Classe Plant
@@ -15,11 +13,12 @@ class Plant:
         self.description = description
         self.prix = prix
     def __str__(self):
-        return '|{:>10}|{:>20}|{:8.2f}|'.format(self.numero,self.description,self.prix)
+        return (f"|{self.numero:>10}|{self.description:>20}"
+                f"|{self.prix:8.2f}|")
 
 liste_plants = []
 
-with open('Plants.csv', mode='r') as fichier_csv:
+with open('Plants.csv', newline='', encoding='utf-8') as fichier_csv:
     lecteur_csv = csv.reader(fichier_csv)
     for ligne in lecteur_csv:
         un_plant = Plant(int(ligne[0]),ligne[1],float(ligne[2]))

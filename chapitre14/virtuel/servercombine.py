@@ -10,11 +10,11 @@ def xml_response():
 @app.route('/json')
 def example():
     data = {'name': 'John', 'age': 30}
-    return json.dumps(data)
+    return data  # Flask convertit le dictionnaire en JSON
 
 @app.route('/')
 def hello_world():
     return '<html><body>Hello World!</body></html>'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

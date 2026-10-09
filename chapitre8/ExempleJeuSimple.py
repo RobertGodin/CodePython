@@ -42,9 +42,9 @@ message = "" # Devient "Victoire !" ou "Défaite..." à la fin
 # Boucle d'animation
 fin = False
 while not fin :
-    event = pygame.event.poll() # Chercher le prochain évènement
-    if event.type == pygame.QUIT: # Fermeture de la fenêtre ?
-        fin = True # Fin de la boucle du jeu
+    for event in pygame.event.get(): # Traiter tous les évènements
+        if event.type == pygame.QUIT: # Fermeture de la fenêtre ?
+            fin = True # Fin de la boucle du jeu
     if message == "" : # La partie est en cours
         raquette.prochaine_scene()
         balle.prochaine_scene()
@@ -72,7 +72,7 @@ while not fin :
         une_brique.dessiner()
     raquette.dessiner()
     balle.dessiner()
-    texte = "Score : "+str(score)+"   Vies : "+str(vies)
+    texte = f"Score : {score}   Vies : {vies}"
     image_texte = police.render(texte, True, Color('black'))
     fenetre.blit(image_texte, (10,570))
     if message != "" :

@@ -2,7 +2,7 @@
 Exercice : dessin de 2 raquettes
 """
 # Importer la bibliothèque de pygame et initialiser
-import sys, pygame
+import pygame
 from pygame import Color
 pygame.init()
 
@@ -32,8 +32,9 @@ pygame.draw.line(fenetre, Color('black'), (50,80),(110,80), 2) # La bande
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 # Traiter la fermeture de la fenêtre
-while True:
+en_cours = True
+while en_cours:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
-            pygame.quit() # Terminer pygame
-            sys.exit()
+        if event.type == pygame.QUIT: # Clic sur la fermeture de fenêtre ?
+            en_cours = False
+pygame.quit() # Terminer pygame

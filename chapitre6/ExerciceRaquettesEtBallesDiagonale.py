@@ -64,51 +64,50 @@ TAILLE_BALLE2 = (50,50)
 # Boucle d'animation
 fin = False
 while not fin :
-    event = pygame.event.poll() # Chercher le prochain évènement à traiter
-    if event.type == pygame.QUIT:  # Utilisateur a cliqué sur la fermeture de fenêtre ?
-        fin = True  # Fin de la boucle du jeu
-    else :
-        # Déplacer la raquette1
-        if x_raquette1+vitesse_x_raquette1 > LARGEUR_FENETRE-TAILLE_RAQUETTE1[0] or x_raquette1+vitesse_x_raquette1 < 0 :
-            vitesse_x_raquette1 = -vitesse_x_raquette1 # Inverser la direction en x
-        x_raquette1 = x_raquette1+vitesse_x_raquette1
-        if y_raquette1+vitesse_y_raquette1 > HAUTEUR_FENETRE-TAILLE_RAQUETTE1[1] or y_raquette1+vitesse_y_raquette1 < 0 :
-            vitesse_y_raquette1 = -vitesse_y_raquette1 # Inverser la direction en y
-        y_raquette1 = y_raquette1+vitesse_y_raquette1
+    for event in pygame.event.get(): # Traiter tous les évènements
+        if event.type == pygame.QUIT: # Fermeture de la fenêtre ?
+            fin = True  # Fin de la boucle du jeu
+    # Déplacer la raquette1
+    if x_raquette1+vitesse_x_raquette1 > LARGEUR_FENETRE-TAILLE_RAQUETTE1[0] or x_raquette1+vitesse_x_raquette1 < 0 :
+        vitesse_x_raquette1 = -vitesse_x_raquette1 # Inverser la direction en x
+    x_raquette1 += vitesse_x_raquette1
+    if y_raquette1+vitesse_y_raquette1 > HAUTEUR_FENETRE-TAILLE_RAQUETTE1[1] or y_raquette1+vitesse_y_raquette1 < 0 :
+        vitesse_y_raquette1 = -vitesse_y_raquette1 # Inverser la direction en y
+    y_raquette1 += vitesse_y_raquette1
 
-        # Déplacer la raquette2
-        if x_raquette2+vitesse_x_raquette2 > LARGEUR_FENETRE-TAILLE_RAQUETTE2[0] or x_raquette2+vitesse_x_raquette2 < 0 :
-            vitesse_x_raquette2 = -vitesse_x_raquette2 # Inverser la direction en x
-        x_raquette2 = x_raquette2+vitesse_x_raquette2
-        if y_raquette2+vitesse_y_raquette2 > HAUTEUR_FENETRE-TAILLE_RAQUETTE2[1] or y_raquette2+vitesse_y_raquette2 < 0 :
-            vitesse_y_raquette2 = -vitesse_y_raquette2 # Inverser la direction en y
-        y_raquette2 = y_raquette2+vitesse_y_raquette2
+    # Déplacer la raquette2
+    if x_raquette2+vitesse_x_raquette2 > LARGEUR_FENETRE-TAILLE_RAQUETTE2[0] or x_raquette2+vitesse_x_raquette2 < 0 :
+        vitesse_x_raquette2 = -vitesse_x_raquette2 # Inverser la direction en x
+    x_raquette2 += vitesse_x_raquette2
+    if y_raquette2+vitesse_y_raquette2 > HAUTEUR_FENETRE-TAILLE_RAQUETTE2[1] or y_raquette2+vitesse_y_raquette2 < 0 :
+        vitesse_y_raquette2 = -vitesse_y_raquette2 # Inverser la direction en y
+    y_raquette2 += vitesse_y_raquette2
 
-        # Déplacer la balle1
-        if x_balle1+vitesse_x_balle1 > LARGEUR_FENETRE-TAILLE_BALLE1[0] or x_balle1+vitesse_x_balle1 < 0 :
-            vitesse_x_balle1 = -vitesse_x_balle1 # Inverser la direction en x
-        x_balle1 = x_balle1+vitesse_x_balle1
-        if y_balle1+vitesse_y_balle1 > HAUTEUR_FENETRE-TAILLE_BALLE1[1] or y_balle1+vitesse_y_balle1 < 0 :
-            vitesse_y_balle1 = -vitesse_y_balle1 # Inverser la direction en y
-        y_balle1 = y_balle1+vitesse_y_balle1
+    # Déplacer la balle1
+    if x_balle1+vitesse_x_balle1 > LARGEUR_FENETRE-TAILLE_BALLE1[0] or x_balle1+vitesse_x_balle1 < 0 :
+        vitesse_x_balle1 = -vitesse_x_balle1 # Inverser la direction en x
+    x_balle1 += vitesse_x_balle1
+    if y_balle1+vitesse_y_balle1 > HAUTEUR_FENETRE-TAILLE_BALLE1[1] or y_balle1+vitesse_y_balle1 < 0 :
+        vitesse_y_balle1 = -vitesse_y_balle1 # Inverser la direction en y
+    y_balle1 += vitesse_y_balle1
 
-        # Déplacer la balle2
-        if x_balle2+vitesse_x_balle2 > LARGEUR_FENETRE-TAILLE_BALLE2[0] or x_balle2+vitesse_x_balle2 < 0 :
-            vitesse_x_balle2 = -vitesse_x_balle2 # Inverser la direction en x
-        x_balle2 = x_balle2+vitesse_x_balle2
-        if y_balle2+vitesse_y_balle2 > HAUTEUR_FENETRE-TAILLE_BALLE2[1] or y_balle2+vitesse_y_balle2 < 0 :
-            vitesse_y_balle2 = -vitesse_y_balle2 # Inverser la direction en y
-        y_balle2 = y_balle2+vitesse_y_balle2
+    # Déplacer la balle2
+    if x_balle2+vitesse_x_balle2 > LARGEUR_FENETRE-TAILLE_BALLE2[0] or x_balle2+vitesse_x_balle2 < 0 :
+        vitesse_x_balle2 = -vitesse_x_balle2 # Inverser la direction en x
+    x_balle2 += vitesse_x_balle2
+    if y_balle2+vitesse_y_balle2 > HAUTEUR_FENETRE-TAILLE_BALLE2[1] or y_balle2+vitesse_y_balle2 < 0 :
+        vitesse_y_balle2 = -vitesse_y_balle2 # Inverser la direction en y
+    y_balle2 += vitesse_y_balle2
 
 
-        fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
-        dessiner_raquette(fenetre,pygame.Rect((x_raquette1,y_raquette1),TAILLE_RAQUETTE1)) # Dessiner la raquette1
-        dessiner_raquette(fenetre,pygame.Rect((x_raquette2,y_raquette2),TAILLE_RAQUETTE2)) # Dessiner la raquette2
-        dessiner_balle(fenetre,pygame.Rect((x_balle1,y_balle1),TAILLE_BALLE1)) # Dessiner la balle1
-        dessiner_balle(fenetre,pygame.Rect((x_balle2,y_balle2),TAILLE_BALLE2)) # Dessiner la balle2
-        pygame.display.flip() # Mettre à jour la fenêtre graphique
+    fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
+    dessiner_raquette(fenetre,pygame.Rect((x_raquette1,y_raquette1),TAILLE_RAQUETTE1)) # Dessiner la raquette1
+    dessiner_raquette(fenetre,pygame.Rect((x_raquette2,y_raquette2),TAILLE_RAQUETTE2)) # Dessiner la raquette2
+    dessiner_balle(fenetre,pygame.Rect((x_balle1,y_balle1),TAILLE_BALLE1)) # Dessiner la balle1
+    dessiner_balle(fenetre,pygame.Rect((x_balle2,y_balle2),TAILLE_BALLE2)) # Dessiner la balle2
+    pygame.display.flip() # Mettre à jour la fenêtre graphique
 
-        horloge.tick(60) # Pour animer avec 60 images par seconde
+    horloge.tick(60) # Pour animer avec 60 images par seconde
 
 pygame.quit() # Terminer pygame
 

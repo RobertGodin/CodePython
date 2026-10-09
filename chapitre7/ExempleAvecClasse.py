@@ -34,10 +34,10 @@ class RaquetteAnimee :
         """ Déplacer la raquette en diagonale en rebondissant sur les bords de la fenetre"""
         if self.r.x+self.v[0] > largeur_fenetre-self.r.width or self.r.x+self.v[0] < 0 :
             self.v[0] = -self.v[0] # Inverser la direction en x
-        self.r.x = self.r.x+self.v[0]
+        self.r.x += self.v[0]
         if self.r.y+self.v[1] > hauteur_fenetre-self.r.height or self.r.y+self.v[1] < 0 :
             self.v[1] = -self.v[1] # Inverser la direction en y
-        self.r.y = self.r.y+self.v[1]
+        self.r.y += self.v[1]
 
 class BalleAnimee :
     """ Un objet représente une balle qui est animée dans une fenêtre Pygame
@@ -67,10 +67,10 @@ class BalleAnimee :
         """ Déplacer la balle en diagonale en rebondissant sur les bords de la fenetre"""
         if self.r.x+self.v[0] > largeur_fenetre-self.r.width or self.r.x+self.v[0] < 0 :
             self.v[0] = -self.v[0] # Inverser la direction en x
-        self.r.x = self.r.x+self.v[0]
+        self.r.x += self.v[0]
         if self.r.y+self.v[1] > hauteur_fenetre-self.r.height or self.r.y+self.v[1] < 0 :
             self.v[1] = -self.v[1] # Inverser la direction en y
-        self.r.y = self.r.y+self.v[1]
+        self.r.y += self.v[1]
 
 pygame.init() # Initialiser les modules de Pygame
 LARGEUR_FENETRE = 400
@@ -89,23 +89,22 @@ balle2 = BalleAnimee(pygame.Rect((300,300),(50,50)),[5,10])
 # Boucle d'animation
 fin = False
 while not fin :
-    event = pygame.event.poll() # Chercher le prochain évènement à traiter
-    if event.type == pygame.QUIT:  # Utilisateur a cliqué sur la fermeture de fenêtre ?
-        fin = True  # Fin de la boucle du jeu
-    else :
-        raquette1.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
-        raquette2.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
-        balle1.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
-        balle2.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
+    for event in pygame.event.get(): # Traiter tous les évènements
+        if event.type == pygame.QUIT: # Fermeture de la fenêtre ?
+            fin = True  # Fin de la boucle du jeu
+    raquette1.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
+    raquette2.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
+    balle1.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
+    balle2.deplacer(LARGEUR_FENETRE,HAUTEUR_FENETRE)
 
-        fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
-        raquette1.dessiner(fenetre)
-        raquette2.dessiner(fenetre)
-        balle1.dessiner(fenetre)
-        balle2.dessiner(fenetre)
+    fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
+    raquette1.dessiner(fenetre)
+    raquette2.dessiner(fenetre)
+    balle1.dessiner(fenetre)
+    balle2.dessiner(fenetre)
 
-        pygame.display.flip() # Mettre à jour la fenêtre graphique
+    pygame.display.flip() # Mettre à jour la fenêtre graphique
 
-        horloge.tick(60) # Pour animer avec 60 images par seconde
+    horloge.tick(60) # Pour animer avec 60 images par seconde
 
 pygame.quit() # Terminer pygame

@@ -2,7 +2,7 @@
 Exemple de fonction dessiner_raquette avec paramètre optionnel et valeur par défaut
 """
 
-import sys, pygame
+import pygame
 from pygame import Color
 
 def dessiner_raquette(fenetre,r,couleur_embouts = Color('red'),couleur_corps = Color('gray')):
@@ -30,7 +30,6 @@ fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
 
 # Variantes d'appel de fonction avec paramètres optionnels
 dessiner_raquette(fenetre,pygame.Rect((20,50),(160,40))) # Employer valeurs par défaut
-BLEU = (0,0,255)
 dessiner_raquette(fenetre,pygame.Rect((20,350),(120,30)),couleur_embouts = Color('blue')) # Spécifier une couleur pour les embouts
 dessiner_raquette(fenetre, pygame.Rect((220,75),(160,40)),couleur_corps = Color('blue')) # Spécifier une couleur pour le corps
 dessiner_raquette(fenetre, pygame.Rect((220,300),(120,30)),couleur_corps = Color('blue'),couleur_embouts = Color('green')) # Spécifier les deux
@@ -38,9 +37,10 @@ dessiner_raquette(fenetre, pygame.Rect((220,300),(120,30)),couleur_corps = Color
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 # Traiter la fermeture de la fenêtre
-while True:
+en_cours = True
+while en_cours:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
-            pygame.quit() # Terminer pygame
-            sys.exit()
+        if event.type == pygame.QUIT: # Clic sur la fermeture de fenêtre ?
+            en_cours = False
+pygame.quit() # Terminer pygame
 

@@ -34,19 +34,18 @@ TAILLE_RAQUETTE = (100,25)
 # Boucle d'animation : La raquette rebondit horizontalement
 fin = False
 while not fin :
-    event = pygame.event.poll() # Chercher le prochain évènement à traiter
-    if event.type == pygame.QUIT:  # Utilisateur a cliqué sur la fermeture de fenêtre ?
-        fin = True  # Fin de la boucle du jeu
-    else :
-        # Déplacer la raquette : Inverser la direction sur le bord est atteint
-        if x_raquette+vitesse_deplacement > LARGEUR_FENETRE-TAILLE_RAQUETTE[0] or x_raquette+vitesse_deplacement < 0 :
-            vitesse_deplacement = -vitesse_deplacement # Inverser la direction
-        x_raquette = x_raquette+vitesse_deplacement
+    for event in pygame.event.get(): # Traiter tous les évènements
+        if event.type == pygame.QUIT: # Fermeture de la fenêtre ?
+            fin = True  # Fin de la boucle du jeu
+    # Déplacer la raquette : Inverser la direction sur le bord est atteint
+    if x_raquette+vitesse_deplacement > LARGEUR_FENETRE-TAILLE_RAQUETTE[0] or x_raquette+vitesse_deplacement < 0 :
+        vitesse_deplacement = -vitesse_deplacement # Inverser la direction
+    x_raquette += vitesse_deplacement
 
-        fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
-        dessiner_raquette(fenetre,pygame.Rect((x_raquette,y_raquette),TAILLE_RAQUETTE)) # Dessiner la raquette
-        pygame.display.flip() # Mettre à jour la fenêtre graphique
+    fenetre.fill(Color('white')) # Dessiner le fond de la surface de dessin
+    dessiner_raquette(fenetre,pygame.Rect((x_raquette,y_raquette),TAILLE_RAQUETTE)) # Dessiner la raquette
+    pygame.display.flip() # Mettre à jour la fenêtre graphique
 
-        horloge.tick(60) # Pour animer avec 60 images par seconde
+    horloge.tick(60) # Pour animer avec 60 images par seconde
 
 pygame.quit() # Terminer pygame

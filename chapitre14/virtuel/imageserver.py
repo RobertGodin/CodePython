@@ -6,14 +6,13 @@ def get_if_exist(data, key):
         return data[key]
     return None
 
-
 def convert_to_degrees(value):
     d = float(value.values[0].num) / float(value.values[0].den)
     m = float(value.values[1].num) / float(value.values[1].den)
     s = float(value.values[2].num) / float(value.values[2].den)
 
     return d + (m / 60.0) + (s / 3600.0)
-    
+
 def get_exif_location(exif_data):
     lat = None
     lon = None
@@ -23,7 +22,8 @@ def get_exif_location(exif_data):
     gps_longitude = get_if_exist(exif_data, 'GPS GPSLongitude')
     gps_longitude_ref = get_if_exist(exif_data, 'GPS GPSLongitudeRef')
 
-    if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
+    if (gps_latitude and gps_latitude_ref
+            and gps_longitude and gps_longitude_ref):
         lat = convert_to_degrees(gps_latitude)
         if gps_latitude_ref.values[0] != 'N':
             lat = 0 - lat
@@ -34,29 +34,29 @@ def get_exif_location(exif_data):
 
     return lat, lon
 
-
 def get_exif_data(image_file):
     with open(image_file, 'rb') as f:
         exif_tags = exifread.process_file(f)
-    return exif_tags 
-
-
-
+    return exif_tags
 
 app = Flask(__name__)
+# Refuser les fichiers de plus de 16 Mo (erreur 413)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-@app.route('/uploader', methods = ['POST'])
+@app.route('/uploader', methods=['POST'])
 def upload_file():
-    print("upload_file")
-    f = request.files['file']
+    f = request.files.get('file')
+    if f is None or not f.filename.lower().endswith(('.jpg', '.jpeg')):
+        return render_template('formulaire.html',
+                               message="Choisissez une image JPEG.")
     lat, long = get_exif_location(exifread.process_file(f))
-    print(lat, long)
     if lat is None:
-        return render_template('formulaire.html', 
-                               message = "Il n'y avait pas de données GPS dans l'image."
-                                +" Choisissez une autre image.")
-    link = "https://www.openstreetmap.org/?mlat="+str(lat)+"&mlon="+str(long)+"&zoom=15"
-    return "<html><body><a href=\""+link+"\">carte</a></body></html>"
+        return render_template('formulaire.html',
+                               message="Il n'y avait pas de données GPS"
+                               " dans l'image. Choisissez une autre image.")
+    link = ("https://www.openstreetmap.org/"
+            f"?mlat={lat}&mlon={long}&zoom=15")
+    return f'<html><body><a href="{link}">carte</a></body></html>'
 
 @app.route('/')
 def index():
@@ -64,7 +64,8 @@ def index():
 
 @app.route('/upload')
 def upload_file_render():
-   print("upload_file_render")
-   return render_template('formulaire.html', message = "Choisissez une image JPEG.")
-	
-app.run()
+    return render_template('formulaire.html',
+                           message="Choisissez une image JPEG.")
+
+if __name__ == '__main__':
+    app.run()

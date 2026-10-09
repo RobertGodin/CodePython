@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Exemple de page html</title>
+    <style type>        
+        /* On utilise le pseudo-sélecteur :nth-child(n) pour cibler les lignes selon leur position */
+        /* On utilise la notation an+b pour indiquer un motif répétitif */
+        /* Par exemple, :nth-child(3n+1) signifie "tous les éléments dont la position est un multiple de 3 plus 1" */
+        
+        /* On sélectionne les lignes dont la position est un multiple de 3 plus 1, c'est-à-dire la première, la quatrième, la septième, etc. */
+        tr:nth-child(3n+4) {
+            /* On définit la couleur de fond de ces lignes à rouge */
+            background-color: red;
+        }
+        
+        /* On sélectionne les lignes dont la position est un multiple de 3 plus 2, c'est-à-dire la deuxième, la cinquième, la huitième, etc. */
+        tr:nth-child(3n+2) {
+            /* On définit la couleur de fond de ces lignes à bleu */
+            background-color: blue;
+        }
+        
+        /* On sélectionne les lignes dont la position est un multiple de 3, c'est-à-dire la troisième, la sixième, la neuvième, etc. */
+        tr:nth-child(3n) {
+            /* On définit la couleur de fond de ces lignes à blanc */
+            background-color: white;
+        }</style>
+</head>
+<body>
+    <h1>Exemple de page html</h1>
+    <table>
+        <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Age</th>
+        </tr>
+        <tr>
+            <td>Dupont</td>
+            <td>Jean</td>
+            <td>25</td>
+        </tr>
+        <tr>
+            <td>Durand</td>
+            <td>Marie</td>
+            <td>30</td>
+        </tr>
+        <tr>
+            <td>Martin</td>
+            <td>Pierre</td>
+            <td>35</td>
+        </tr>
+        <tr>
+            <td>Luc</td>
+            <td>Roger</td>
+            <td>33</td>
+        </tr>
+        <tr>
+            <td>Annie</td>
+            <td>Marie</td>
+            <td>31</td>
+        </tr>
+    </table>
+
+</body>
+</html>
+

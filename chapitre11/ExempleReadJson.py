@@ -11,10 +11,14 @@ class Plant:
         self.description = description
         self.prix = prix
     def __str__(self):
-        return '|{:>10}|{:>20}|{:8.2f}|'.format(self.numero,self.description,self.prix)
+        return (f"|{self.numero:>10}|{self.description:>20}"
+                f"|{self.prix:8.2f}|")
 
-with open('Plants.json', mode = 'r') as fichier_json: 
-    liste_plants = json.load(fichier_json)
+with open('Plants.json', mode='r', encoding='utf-8') as fichier_json:
+    donnees = json.load(fichier_json)
+
+# Reconstruire les objets Plant à partir des dictionnaires
+liste_plants = [Plant(**d) for d in donnees]
 
 for un_plant in liste_plants:
     print(un_plant)

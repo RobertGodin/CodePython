@@ -2,7 +2,7 @@
 Exemple de fonction dessiner_raquette
 """
 
-import sys, pygame
+import pygame
 from pygame import Color
 
 def dessiner_raquette(r):
@@ -34,8 +34,9 @@ dessiner_raquette(pygame.Rect((20,50),(120,40)))
 pygame.display.flip() # Mettre à jour la fenêtre graphique
 
 # Traiter la fermeture de la fenêtre
-while True:
+en_cours = True
+while en_cours:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: # Vérifier si l'utilisateur a cliqué pour fermer la fenêtre
-            pygame.quit() # Terminer pygame
-            sys.exit()
+        if event.type == pygame.QUIT: # Clic sur la fermeture de fenêtre ?
+            en_cours = False
+pygame.quit() # Terminer pygame

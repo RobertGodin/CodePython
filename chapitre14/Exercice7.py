@@ -1,8 +1,21 @@
 # Importer le module flask
 from flask import Flask
 
-# Importer le module sqlite3, qui permet de manipuler des bases de données sqlite
+# Importer le module sqlite3
 import sqlite3
+
+# Importer le module datetime
+from datetime import datetime
+
+# Importer le module locale
+import locale
+
+# Définir le paramètre régional une seule fois, au démarrage
+try:
+    locale.setlocale(locale.LC_TIME, "fr_CA.UTF-8")
+except locale.Error:
+    # Paramètre régional non installé : on garde celui par défaut
+    pass
 
 # Créer une instance de l'application Flask
 app = Flask(__name__)
@@ -10,13 +23,13 @@ app = Flask(__name__)
 # Définir le nom du fichier de la base de données
 db_file = "access.db"
 
-# Définir la fonction qui crée la table de la base de données si elle n'existe pas
+# Définir la fonction qui crée la table
 def create_table():
     # Se connecter à la base de données
     conn = sqlite3.connect(db_file)
     # Créer un curseur pour exécuter des commandes SQL
     cursor = conn.cursor()
-    # Créer la table access si elle n'existe pas, avec deux colonnes: id et date
+    # Créer la table access si elle n'existe pas
     cursor.execute("CREATE TABLE IF NOT EXISTS access (id INTEGER PRIMARY KEY, date TEXT)")
     # Valider les changements
     conn.commit()
@@ -29,7 +42,7 @@ def insert_date(date):
     conn = sqlite3.connect(db_file)
     # Créer un curseur pour exécuter des commandes SQL
     cursor = conn.cursor()
-    # Insérer la date dans la table access, en laissant l'id se générer automatiquement
+    # Insérer la date dans la table access
     cursor.execute("INSERT INTO access (date) VALUES (?)", (date,))
     # Valider les changements
     conn.commit()
@@ -54,19 +67,10 @@ def get_table_content():
 # Définir la route principale
 @app.route("/")
 def index():
-    # Importer le module datetime
-    from datetime import datetime
-
-    # Importer le module locale, qui permet de gérer les paramètres régionaux
-    import locale
-
-    # Définir le paramètre régional à "fr_CA" pour le français du Canada
-    locale.setlocale(locale.LC_TIME, "fr_CA")
-
     # Obtenir la date et l'heure
     now = datetime.now()
 
-    # Formater la date et l'heure en français avec la méthode strftime
+    # Formater la date et l'heure
     date = now.strftime("%A %d %B %Y")
     heure = now.strftime("%H:%M:%S")
 
@@ -84,7 +88,7 @@ def index():
 
     # Parcourir le contenu de la table
     for row in content:
-        # Ajouter une ligne au tableau avec les valeurs de l'id et de la date
+        # Ajouter une ligne au tableau
         table += f"<tr><td>{row[0]}</td><td>{row[1]}</td></tr>"
 
     # Retourner une page web avec la date et l'heure et le tableau
@@ -109,4 +113,3 @@ def index():
 # Lancer l'application Flask
 if __name__ == "__main__":
     app.run()
-

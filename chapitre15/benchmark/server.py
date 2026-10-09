@@ -1,5 +1,3 @@
-# do:
-# pip install sanic
 import sanic
 
 app = sanic.Sanic(__name__)
@@ -12,14 +10,12 @@ async def sendToOthers(request, ws):
     try:
         while True:
             message = await ws.recv()
-            for client in connected:
+            # list() : une copie, car connected peut changer pendant await
+            for client in list(connected):
                 if client is not ws:
                     await client.send(message)
     finally:
-        connected.remove(ws)
-
+        connected.discard(ws)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8087)
-
-    
+    app.run(host='0.0.0.0', port=8080)
