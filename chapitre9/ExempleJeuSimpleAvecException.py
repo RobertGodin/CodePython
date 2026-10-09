@@ -65,10 +65,10 @@ else :
                     balle.rebondir_sur(une_brique)
                     if une_brique.frapper() :
                         liste_briques.remove(une_brique)
-                        score = score+10
+                        score += 10
                     break # Un seul rebond par scène
             if balle.perdue() :
-                vies = vies-1
+                vies -= 1
                 balle.r.topleft = (195,400) # Balle remise en jeu
                 balle.v = [3,-4]
             if len(liste_briques) == 0 :

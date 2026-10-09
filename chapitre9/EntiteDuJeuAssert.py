@@ -55,10 +55,10 @@ class EntiteAnimeeAvecSon :
         """ Déplacer selon self.v en diagonale en rebondissant sur les bords de la fenetre"""
         if self.r.x+self.v[0] > EntiteAnimeeAvecSon.f.get_width()-self.r.width or self.r.x+self.v[0] < 0 :
             self.v[0] = +self.v[0] # Inverser la direction en x (bug introduit pour l'exemple !)
-        self.r.x = self.r.x+self.v[0]
+        self.r.x += self.v[0]
         if self.r.y+self.v[1] > EntiteAnimeeAvecSon.f.get_height()-self.r.height or self.r.y+self.v[1] < 0 :
             self.v[1] = -self.v[1] # Inverser la direction en y
-        self.r.y = self.r.y+self.v[1]
+        self.r.y += self.v[1]
         assert self.r.x >= 0 and self.r.x <= EntiteAnimeeAvecSon.f.get_width()-self.r.width, "La position x dépasse du cadre du jeu"
         assert self.r.y >= 0 and self.r.y <= EntiteAnimeeAvecSon.f.get_height()-self.r.height, "La position y dépasse du cadre du jeu"
 
@@ -86,7 +86,7 @@ class Balle(EntiteAnimeeAvecSon):
     """ La balle rebondit sur les bords, sauf sur le bord du bas """
     def prochaine_scene(self):
         if self.r.bottom+self.v[1] > Balle.f.get_height() :
-            self.r.y = self.r.y+self.v[1] # La balle sort par le bas
+            self.r.y += self.v[1] # La balle sort par le bas
         else :
             super().prochaine_scene()
 
@@ -135,7 +135,7 @@ class BriqueResistante(Brique):
 
     def frapper(self):
         super().frapper()
-        self.coups_restants = self.coups_restants-1
+        self.coups_restants -= 1
         return self.coups_restants == 0
 
     def dessiner(self):
